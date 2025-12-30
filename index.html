@@ -662,6 +662,109 @@
       </div>
 
       <div class="mt-4 rounded-2xl border bg-white p-4">
+        <details class="group">
+          <summary class="cursor-pointer list-none select-none flex items-center justify-between gap-3">
+            <div>
+              <div class="text-sm font-extrabold">Deploy ke GitHub Pages</div>
+              <div class="text-xs text-slate-500">Panduan upload ke GitHub + setting Firebase agar Cloud Sync & upload gambar tetap jalan.</div>
+            </div>
+            <div class="rounded-xl border px-3 py-1.5 text-sm font-semibold group-open:bg-slate-900 group-open:text-white">Lihat</div>
+          </summary>
+
+          <div class="mt-3 grid grid-cols-1 lg:grid-cols-12 gap-4 text-sm text-slate-700">
+            <div class="lg:col-span-6 rounded-xl border bg-slate-50 p-3">
+              <div class="font-bold">1) Upload project ke GitHub</div>
+              <ol class="mt-2 list-decimal pl-5 space-y-1 text-slate-600">
+                <li>Buat repository baru di GitHub (mis: <b>varsha-store</b>).</li>
+                <li>Pastikan file <b>index.html</b> ada di root repository.</li>
+                <li>Commit & push ke branch <b>main</b>.</li>
+              </ol>
+              <div class="mt-3 text-xs text-slate-500">
+                Tips: karena ini single file, kamu cukup upload <b>index.html</b> saja.
+              </div>
+            </div>
+
+            <div class="lg:col-span-6 rounded-xl border bg-slate-50 p-3">
+              <div class="font-bold">2) Aktifkan GitHub Pages</div>
+              <ol class="mt-2 list-decimal pl-5 space-y-1 text-slate-600">
+                <li>Buka repo → <b>Settings</b> → <b>Pages</b>.</li>
+                <li>Pilih: <b>Build and deployment</b> → <b>Deploy from a branch</b>.</li>
+                <li>Branch: <b>main</b>, folder: <b>/ (root)</b> → Save.</li>
+                <li>Tunggu 1–2 menit sampai muncul URL <span class="font-mono">https://USERNAME.github.io/REPO/</span>.</li>
+              </ol>
+              <div class="mt-3 text-xs">
+                <a class="font-semibold text-emerald-700 hover:underline" target="_blank" href="https://pages.github.com/">Buka dokumentasi GitHub Pages</a>
+              </div>
+            </div>
+
+            <div class="lg:col-span-12 rounded-xl border bg-slate-50 p-3">
+              <div class="font-bold">2.5) Deployment Helper (cek domain & URL)</div>
+              <div class="mt-2 text-xs text-slate-600">Domain yang perlu ditambahkan ke <b>Firebase Authorized domains</b>:</div>
+              <div class="mt-1 text-sm font-mono" id="currentHost">-</div>
+              <div class="mt-2 text-xs text-slate-600">URL website saat ini:</div>
+              <div class="mt-1 text-sm font-mono break-all" id="currentOrigin">-</div>
+              <div id="fileProtocolWarn" class="hidden mt-3 rounded-xl border bg-amber-50 p-3 text-xs text-amber-900">
+                Kamu sedang membuka dari <b>file://</b>. Firebase Auth/Cloud Sync biasanya tidak jalan dari file lokal. Deploy dulu ke GitHub Pages (https), lalu buka dari URL GitHub Pages.
+              </div>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <button id="copyAuthorizedDomainBtn" class="rounded-xl border px-3 py-2 text-xs font-bold hover:bg-white">Copy Domain</button>
+                <button id="copySiteUrlBtn" class="rounded-xl border px-3 py-2 text-xs font-bold hover:bg-white">Copy URL</button>
+              </div>
+              <div class="mt-2 text-xs text-slate-500">Tips: untuk GitHub Pages biasanya domainnya <span class="font-mono">USERNAME.github.io</span> (tanpa path repo).</div>
+            </div>
+
+            <div class="lg:col-span-12 rounded-xl border bg-amber-50 p-3">
+              <div class="font-bold text-amber-900">3) Setting Firebase agar berjalan di domain GitHub Pages</div>
+              <ul class="mt-2 list-disc pl-5 space-y-1 text-amber-900">
+                <li><b>Cloud Sync tidak akan jalan jika dibuka dari file lokal</b> (<span class="font-mono">file://</span>). Gunakan URL GitHub Pages (https).</li>
+                <li>Firebase Console → <b>Authentication</b> → <b>Settings</b> → <b>Authorized domains</b> → tambahkan domain: <span class="font-mono">USERNAME.github.io</span>.</li>
+                <li>Jika pakai custom domain, tambahkan juga domain custom tersebut.</li>
+              </ul>
+              <div class="mt-3 text-xs">
+                <a class="font-semibold text-emerald-700 hover:underline" target="_blank" href="https://console.firebase.google.com/">Buka Firebase Console</a>
+              </div>
+            </div>
+
+            <div class="lg:col-span-6 rounded-xl border bg-slate-50 p-3">
+              <div class="flex items-center justify-between gap-2">
+                <div class="font-bold">Contoh Firestore Rules (demo)</div>
+                <button id="copyFirestoreRulesBtn" class="rounded-xl border px-3 py-1.5 text-xs font-bold hover:bg-white">Copy</button>
+              </div>
+              <pre class="mt-2 overflow-auto rounded-xl border bg-white p-3 text-xs text-slate-800"><code id="firestoreRulesSample">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /varsha_shops/{shopId} {
+      // Demo: allow authenticated users
+      allow read, write: if request.auth != null;
+    }
+  }
+}</code></pre>
+              <div class="mt-2 text-xs text-slate-500">Untuk produksi, rules sebaiknya membatasi akses per user/toko.</div>
+            </div>
+
+            <div class="lg:col-span-6 rounded-xl border bg-slate-50 p-3">
+              <div class="flex items-center justify-between gap-2">
+                <div class="font-bold">Contoh Storage Rules (upload gambar)</div>
+                <button id="copyStorageRulesBtn" class="rounded-xl border px-3 py-1.5 text-xs font-bold hover:bg-white">Copy</button>
+              </div>
+              <pre class="mt-2 overflow-auto rounded-xl border bg-white p-3 text-xs text-slate-800"><code id="storageRulesSample">rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /varsha_shops/{shopId}/product_images/{fileName} {
+      // Read needed so marketplace can show images
+      allow read: if true;
+      // Upload only for authenticated users (anonymous auth counts as authenticated)
+      allow write: if request.auth != null;
+    }
+  }
+}</code></pre>
+              <div class="mt-2 text-xs text-slate-500">Jika ingin gambar tidak publik, read harus dibatasi dan tampilan gambar perlu mekanisme auth.</div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="mt-4 rounded-2xl border bg-white p-4">
         <div class="text-sm font-semibold">Catatan</div>
         <ul class="mt-2 list-disc pl-5 text-sm text-slate-600 space-y-1">
           <li>CSV kompatibel dengan Excel (gunakan delimiter koma). Jika Excel regional memakai titik-koma, gunakan fitur import CSV.</li>
@@ -2911,6 +3014,65 @@
             console.warn(e);
             toast(e?.message || 'Gagal push.');
           }
+        });
+      }
+
+      // GitHub Pages helper: copy rules
+      const copyFirestoreRulesBtn = document.getElementById('copyFirestoreRulesBtn');
+      const copyStorageRulesBtn = document.getElementById('copyStorageRulesBtn');
+
+      async function copyText(text) {
+        const t = (text || '').trim();
+        if (!t) return;
+        try {
+          await navigator.clipboard.writeText(t);
+          toast('Tersalin ke clipboard.');
+        } catch {
+          // fallback
+          const ta = document.createElement('textarea');
+          ta.value = t;
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+          toast('Tersalin ke clipboard.');
+        }
+      }
+
+      function copyTextFromEl(el) {
+        return copyText((el?.textContent || ''));
+      }
+
+      if (copyFirestoreRulesBtn) {
+        copyFirestoreRulesBtn.addEventListener('click', () => copyTextFromEl(document.getElementById('firestoreRulesSample')));
+      }
+      if (copyStorageRulesBtn) {
+        copyStorageRulesBtn.addEventListener('click', () => copyTextFromEl(document.getElementById('storageRulesSample')));
+      }
+
+      // Deployment helper (domain / url)
+      const hostEl = document.getElementById('currentHost');
+      const originEl = document.getElementById('currentOrigin');
+      const warnEl = document.getElementById('fileProtocolWarn');
+      if (hostEl) hostEl.textContent = window.location.host || '(no host)';
+      if (originEl) originEl.textContent = window.location.origin || window.location.href;
+      if (warnEl) warnEl.classList.toggle('hidden', window.location.protocol !== 'file:');
+
+      const copyDomainBtn = document.getElementById('copyAuthorizedDomainBtn');
+      const copyUrlBtn = document.getElementById('copySiteUrlBtn');
+      if (copyDomainBtn) {
+        copyDomainBtn.addEventListener('click', () => {
+          const domain = window.location.host || '';
+          if (!domain) return toast('Domain tidak tersedia.');
+          copyText(domain);
+        });
+      }
+      if (copyUrlBtn) {
+        copyUrlBtn.addEventListener('click', () => {
+          const url = window.location.origin || window.location.href;
+          copyText(url);
         });
       }
     }
