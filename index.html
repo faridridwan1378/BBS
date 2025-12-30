@@ -655,6 +655,13 @@
                   <button id="cloudPushBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Push (Kirim ke Cloud)</button>
                 </div>
               </div>
+
+              <div id="cloudErrorWrap" class="hidden mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-900">
+                <div class="font-extrabold">Cloud Error / Troubleshooting</div>
+                <div id="cloudErrorText" class="mt-1 font-mono break-all"></div>
+                <div id="cloudErrorHints" class="mt-2 text-rose-900"></div>
+              </div>
+
               <div class="mt-2 text-xs text-slate-500">Config default sudah disiapkan untuk project <b>belanja-buah-segar</b> (boleh diganti jika perlu). Jika konflik terjadi, tombol <b>Push</b> akan menimpa data cloud dengan data gadget ini. Tombol <b>Pull</b> menimpa data gadget ini dengan data cloud.</div>
             </div>
           </div>
@@ -1693,6 +1700,14 @@ service firebase.storage {
         toast('Produk ditambahkan.');
       }
       setProducts(products);
+
+      // push segera agar perubahan (termasuk URL gambar) langsung tersinkron ke gadget lain
+      const enabled = !!load(LS.cloudEnabled, false);
+      const shopId = load(LS.cloudShopId, '');
+      if (enabled && cloud.connected && shopId) {
+        cloudPush(shopId, { silent: true }).catch(() => {});
+      }
+
       closeModal('productModal');
       rerenderAll();
       routeTo('admin.products');
@@ -2251,7 +2266,8 @@ service firebase.storage {
         shopEl.value = shopId || 'varsha-shop-01';
       }
 
-      updateCloudStatusUI(enabled ? 'Ready (saved config)' : 'Offline');
+      // If already connected, keep the live status (do not overwrite to Ready)
+      if (!cloud.connected) updateCloudStatusUI(enabled ? 'Ready (saved config)' : 'Offline');
     }
 
     /**********************
@@ -2262,6 +2278,7 @@ service firebase.storage {
       db: null,
       auth: null,
       storage: null,
+      bucket: '',
       unsub: null,
       connected: false,
       applyingRemote: false,
@@ -2271,6 +2288,9 @@ service firebase.storage {
 
     function cloudStorageRef(path) {
       if (!cloud.storage) throw new Error('Storage belum siap');
+      const bucket = String(cloud.bucket || '').trim();
+      // Prefer refFromURL so we can explicitly target the right bucket.
+      if (bucket) return cloud.storage.refFromURL(`gs://${bucket}/${path}`);
       return cloud.storage.ref().child(path);
     }
 
@@ -2292,6 +2312,15 @@ service firebase.storage {
       if (!shopId) throw new Error('Shop ID belum diisi.');
       if (!file) throw new Error('Pilih file gambar dulu.');
       if (!file.type?.startsWith('image/')) throw new Error('File harus gambar (image/*).');
+
+      // Ensure auth session exists for Storage rules that require authenticated users
+      if (!cloud.auth?.currentUser) {
+        await cloud.auth.signInAnonymously();
+      }
+      try {
+        // Force token refresh (helps on some browsers where Storage upload hangs until token exists)
+        await cloud.auth.currentUser.getIdToken(true);
+      } catch {}
 
       const maxMb = 3.5;
       if (file.size > maxMb * 1024 * 1024) throw new Error(`Ukuran file terlalu besar. Maks ${maxMb} MB.`);
@@ -2318,14 +2347,34 @@ service firebase.storage {
       const task = ref.put(file, meta);
 
       return await new Promise((resolve, reject) => {
+        let lastProgressAt = Date.now();
+        let lastTransferred = 0;
+
+        const watchdog = setInterval(() => {
+          const stuckMs = Date.now() - lastProgressAt;
+          if (stuckMs > 12000) {
+            clearInterval(watchdog);
+            try { task.cancel(); } catch {}
+            reject(new Error('Upload macet (tidak ada progress). Cek: (1) Firebase Storage sudah diaktifkan, (2) Storage Rules mengizinkan write, (3) bucket benar.'));
+          }
+        }, 1500);
+
         task.on('state_changed',
           (snap) => {
             const pct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
             if (bar) bar.style.width = pct + '%';
             if (txt) txt.textContent = pct + '%';
+            if (snap.bytesTransferred !== lastTransferred) {
+              lastTransferred = snap.bytesTransferred;
+              lastProgressAt = Date.now();
+            }
           },
-          (err) => reject(err),
+          (err) => {
+            clearInterval(watchdog);
+            reject(err);
+          },
           async () => {
+            clearInterval(watchdog);
             try {
               const url = await task.snapshot.ref.getDownloadURL();
               resolve({ url, storagePath });
@@ -2430,6 +2479,95 @@ service firebase.storage {
       }
     }
 
+    function hideCloudError() {
+      const wrap = document.getElementById('cloudErrorWrap');
+      if (wrap) wrap.classList.add('hidden');
+    }
+
+    function showCloudError(err) {
+      const wrap = document.getElementById('cloudErrorWrap');
+      const textEl = document.getElementById('cloudErrorText');
+      const hintsEl = document.getElementById('cloudErrorHints');
+      if (!wrap || !textEl || !hintsEl) return;
+
+      const info = explainFirebaseError(err);
+      textEl.textContent = info.raw;
+      hintsEl.innerHTML = info.hintsHtml;
+      wrap.classList.remove('hidden');
+    }
+
+    function explainFirebaseError(err) {
+      const code = String(err?.code || '').trim();
+      const msg = String(err?.message || err || '').trim();
+      const raw = [code, msg].filter(Boolean).join(' | ') || 'Unknown error';
+      const lc = raw.toLowerCase();
+
+      const hints = [];
+
+      // common: auth domain not authorized / restricted
+      if (lc.includes('auth/unauthorized-domain') || lc.includes('unauthorized domain') || lc.includes('not authorized')) {
+        hints.push(
+          `<b>Penyebab paling umum:</b> domain website belum ditambahkan ke <b>Firebase Authorized domains</b>.` +
+          `<br>Perbaikan: Firebase Console → Authentication → Settings → Authorized domains → tambahkan <span class="font-mono">${window.location.host || 'USERNAME.github.io'}</span>.`
+        );
+      }
+
+      if (
+        (lc.includes('api key') && lc.includes('restricted')) ||
+        lc.includes('key is restricted') ||
+        (lc.includes('requests') && lc.includes('referer') && (lc.includes('blocked') || lc.includes('not allowed'))) ||
+        (lc.includes('referer') && lc.includes('blocked'))
+      ) {
+        hints.push(
+          `<b>API key restricted:</b> API Key kamu dibatasi (Application restrictions / API restrictions) sehingga request Firebase ditolak.` +
+          `<br>Perbaikan: Google Cloud Console → APIs & Services → Credentials → API key → set <b>Application restrictions</b> ke <b>None</b> atau tambahkan domain kamu ke <b>HTTP referrers</b> (contoh: <span class="font-mono">${window.location.host || 'USERNAME.github.io'}</span>).`
+        );
+      }
+
+      if (lc.includes('permission-denied') || lc.includes('missing or insufficient permissions')) {
+        hints.push(
+          `<b>Firestore rules menolak akses:</b> akses ke Firestore ditolak oleh Rules.` +
+          `<br>Perbaikan: Firebase Console → Firestore Database → Rules. Untuk demo, pakai contoh rules di menu <b>Laporan → Deploy ke GitHub Pages</b> (tombol Copy).`
+        );
+      }
+
+      if (lc.includes('storage/unauthorized') || lc.includes('storage/unauthenticated')) {
+        hints.push(
+          `<b>Storage rules menolak upload:</b> pastikan Storage Rules mengizinkan <b>write</b> untuk user authenticated.` +
+          `<br>Lihat contoh Storage rules di bagian Deploy (menu Laporan).`
+        );
+      }
+
+      if (lc.includes('storage') && (lc.includes('not found') || lc.includes('404'))) {
+        hints.push(
+          `<b>Firebase Storage belum aktif / bucket tidak ditemukan:</b> buka Firebase Console → <b>Storage</b> → lakukan setup (Get started).` +
+          `<br>Pastikan bucket benar (umumnya <span class="font-mono">PROJECT_ID.appspot.com</span>).`
+        );
+      }
+
+      if (lc.includes('bucket') && (lc.includes('invalid') || lc.includes('does not exist'))) {
+        hints.push(
+          `<b>Bucket Storage bermasalah:</b> pastikan field <b>storageBucket</b> di firebaseConfig benar.` +
+          `<br>Untuk Firebase umumnya: <span class="font-mono">${DEFAULT_FIREBASE_CONFIG.projectId}.appspot.com</span>.`
+        );
+      }
+
+      if (window.location.protocol === 'file:') {
+        hints.push(
+          `<b>Kamu membuka dari file://</b>. Firebase Auth/Firestore sering gagal dari file lokal.` +
+          `<br>Solusi: deploy ke GitHub Pages (https) lalu buka dari URL tersebut.`
+        );
+      }
+
+      if (!hints.length) {
+        hints.push(
+          `Cek juga: (1) Firestore aktif, (2) Anonymous Auth enabled, (3) Authorized domains benar, (4) Rules Firestore/Storage.`
+        );
+      }
+
+      return { raw, hintsHtml: '<ul class="list-disc pl-5 space-y-1">' + hints.map(h => `<li>${h}</li>`).join('') + '</ul>' };
+    }
+
     function updateCloudStatusUI(text) {
       const el = document.getElementById('cloudStatus');
       if (el) el.innerHTML = `Status: <span class="font-semibold">${text}</span>`;
@@ -2497,9 +2635,12 @@ service firebase.storage {
       if (!cfgText || !shopId) return;
       try {
         await cloudConnect({ configText: cfgText, shopId });
+        hideCloudError();
       } catch (e) {
         console.warn('Cloud auto-connect failed', e);
         updateCloudStatusUI('Offline (auto-connect gagal)');
+        // show detail in reports page (if user opens it)
+        showCloudError(e);
       }
     }
 
@@ -2518,6 +2659,12 @@ service firebase.storage {
         cloud.app = firebase.initializeApp(config);
         cloud.auth = firebase.auth();
         cloud.db = firebase.firestore();
+        const rawBucket = String(config.storageBucket || '').trim();
+        // Many Firebase configs use projectId.appspot.com as bucket name.
+        // Some configs (or copied settings) may contain *.firebasestorage.app which often breaks gs:// refs.
+        cloud.bucket = rawBucket && rawBucket.endsWith('.firebasestorage.app')
+          ? `${config.projectId}.appspot.com`
+          : rawBucket;
         cloud.storage = firebase.storage();
       }
 
@@ -2527,7 +2674,8 @@ service firebase.storage {
       }
 
       cloud.connected = true;
-      updateCloudStatusUI(`Connected • projectId=${config.projectId} • shop=${shopId}`);
+      const bucketInfo = cloud.bucket ? ` • bucket=${cloud.bucket}` : '';
+      updateCloudStatusUI(`Connected • projectId=${config.projectId}${bucketInfo} • shop=${shopId}`);
 
       // set baseline for new order notification
       const currentTx = getTransactions();
@@ -2555,7 +2703,7 @@ service firebase.storage {
       return cloud.db.collection('varsha_shops').doc(shopId);
     }
 
-    async function cloudPush(shopId) {
+    async function cloudPush(shopId, opts = {}) {
       if (!cloud.connected) throw new Error('Belum connect');
       const deviceId = getOrCreateDeviceId();
       const snap = snapshotData();
@@ -2571,7 +2719,7 @@ service firebase.storage {
         hash,
         data: snap
       }, { merge: true });
-      toast('Push ke cloud berhasil.');
+      if (!opts?.silent) toast('Push ke cloud berhasil.');
       updateCloudStatusUI(`Connected • Last push ${new Date().toLocaleTimeString('id-ID')}`);
     }
 
@@ -2654,7 +2802,7 @@ service firebase.storage {
       clearTimeout(cloudAuto.t);
       cloudAuto.t = setTimeout(async () => {
         try {
-          await cloudPush(shopId);
+          await cloudPush(shopId, { silent: true });
         } catch (e) {
           console.warn('Auto-push failed', e);
         }
@@ -2786,6 +2934,8 @@ service firebase.storage {
           } catch (e) {
             console.warn(e);
             toast(e?.message || 'Gagal upload gambar.');
+            // Also show detail in the Cloud Sync troubleshooting panel (useful for Storage errors)
+            showCloudError(e);
           } finally {
             uploadBtn.disabled = false;
             uploadBtn.classList.remove('opacity-60');
@@ -2975,17 +3125,20 @@ service firebase.storage {
           if (!configText) return toast('Firebase config JSON harus diisi.');
           try {
             await cloudConnect({ configText, shopId });
+            hideCloudError();
             toast('Cloud sync tersambung.');
           } catch (e) {
             console.warn(e);
-            toast(e?.message || 'Gagal connect cloud.');
+            toast('Gagal connect cloud. Lihat detail di menu Laporan.');
             updateCloudStatusUI('Offline');
+            showCloudError(e);
           }
         });
       }
       if (cloudDisconnectBtn) {
         cloudDisconnectBtn.addEventListener('click', async () => {
           await cloudDisconnect();
+          hideCloudError();
         });
       }
       if (cloudPullBtn) {
@@ -2996,9 +3149,11 @@ service firebase.storage {
           if (!confirm('Pull akan menimpa data di gadget ini dengan data cloud. Lanjutkan?')) return;
           try {
             await cloudPull(shopId);
+            hideCloudError();
           } catch (e) {
             console.warn(e);
-            toast(e?.message || 'Gagal pull.');
+            toast('Gagal pull. Lihat detail di menu Laporan.');
+            showCloudError(e);
           }
         });
       }
@@ -3010,9 +3165,11 @@ service firebase.storage {
           if (!confirm('Push akan menimpa data cloud dengan data gadget ini. Lanjutkan?')) return;
           try {
             await cloudPush(shopId);
+            hideCloudError();
           } catch (e) {
             console.warn(e);
-            toast(e?.message || 'Gagal push.');
+            toast('Gagal push. Lihat detail di menu Laporan.');
+            showCloudError(e);
           }
         });
       }
