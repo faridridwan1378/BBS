@@ -628,7 +628,13 @@
               <div class="text-sm font-semibold">Cloud Sync (Firebase) • Multi Gadget</div>
               <div class="mt-1 text-xs text-slate-500">Sinkron real-time antar perangkat memakai Firebase Firestore. Semua gadget harus memakai <b>Firebase config</b> dan <b>Shop ID</b> yang sama.</div>
               <div class="mt-3 rounded-xl border bg-amber-50 p-3 text-xs text-amber-900">
-                <b>Penting:</b> Untuk demo lokal, fitur ini membutuhkan project Firebase milik Anda. Jika belum ada, buat di console.firebase.google.com → aktifkan <b>Firestore</b> dan <b>Anonymous Auth</b>.
+                <div class="font-extrabold">Penting (Setup & Biaya)</div>
+                <ul class="mt-2 list-disc pl-5 space-y-1">
+                  <li>Fitur ini membutuhkan project Firebase milik Anda. Jika belum ada, buat di console.firebase.google.com → aktifkan <b>Firestore</b> dan <b>Anonymous Auth</b>.</li>
+                  <li><b>Firebase ada paket gratis (Spark)</b> dengan kuota. Jika pemakaian melewati kuota (misalnya banyak transaksi/gambar/bandwidth), bisa muncul kebutuhan upgrade ke <b>Blaze (pay-as-you-go)</b>.</li>
+                  <li>Untuk aman: pantau tab <b>Usage</b>, buat <b>Budget alert</b> di Google Cloud Billing (kalau pakai Blaze), dan batasi upload gambar berukuran besar.</li>
+                </ul>
+                <div class="mt-2">Referensi: <a class="font-semibold underline" target="_blank" href="https://firebase.google.com/pricing">firebase.google.com/pricing</a></div>
               </div>
             </div>
             <div class="flex flex-col sm:flex-row gap-2">
@@ -651,6 +657,7 @@
                 <div class="flex flex-wrap gap-2">
                   <button id="cloudFillDefaultBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50" title="Isi otomatis config default">Gunakan Config Default</button>
                   <button id="cloudClearConfigBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50" title="Kosongkan field config">Clear</button>
+                  <button id="cloudTestStorageBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50" title="Cek apakah Firebase Storage aktif & rules mengizinkan upload">Test Storage</button>
                   <button id="cloudPullBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Pull (Ambil dari Cloud)</button>
                   <button id="cloudPushBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Push (Kirim ke Cloud)</button>
                 </div>
@@ -663,6 +670,135 @@
               </div>
 
               <div class="mt-2 text-xs text-slate-500">Config default sudah disiapkan untuk project <b>belanja-buah-segar</b> (boleh diganti jika perlu). Jika konflik terjadi, tombol <b>Push</b> akan menimpa data cloud dengan data gadget ini. Tombol <b>Pull</b> menimpa data gadget ini dengan data cloud.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-12 rounded-2xl border bg-white p-4">
+          <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+            <div class="max-w-2xl">
+              <div class="text-sm font-semibold">Alternatif selain Firebase</div>
+              <div class="mt-1 text-xs text-slate-500">Jika tidak ingin Firebase, kamu bisa pakai backend lain untuk sinkron multi-gadget dan order real-time.</div>
+              <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 space-y-1">
+                <li><b>Supabase</b> (Postgres + Auth + Storage + Realtime) — mirip Firebase, cocok untuk web app.</li>
+                <li><b>Appwrite</b> / <b>PocketBase</b> — bisa self-host, kontrol penuh (butuh server/VPS).</li>
+                <li><b>Google Sheets + Apps Script</b> — cocok untuk toko kecil, data masuk ke Sheet (seperti “server” sederhana).</li>
+                <li><b>Custom API</b> (Node/Express, Laravel, dll) + database — paling fleksibel.</li>
+              </ul>
+              <details class="mt-3">
+                <summary class="cursor-pointer text-sm font-semibold text-emerald-700">Tips memilih (klik)</summary>
+                <div class="mt-2 text-xs text-slate-600 space-y-1">
+                  <div><b>Paling mudah (tanpa coding backend):</b> Webhook ke Pipedream/Make/n8n/Apps Script.</div>
+                  <div><b>Paling mirip Firebase:</b> Supabase.</div>
+                  <div><b>Paling murah & kontrol penuh:</b> PocketBase/Appwrite self-host (tapi perlu server).</div>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div class="lg:col-span-8 rounded-2xl border bg-slate-50 p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-sm font-extrabold">Order Webhook (kirim order ke server)</div>
+                  <div class="mt-1 text-xs text-slate-600">Saat customer checkout, aplikasi akan <b>POST JSON</b> ke URL ini. Cocok untuk integrasi ke Pipedream/Make/n8n/Apps Script/Server kamu.</div>
+                </div>
+                <label class="inline-flex items-center gap-2 text-sm font-semibold">
+                  <input id="orderWebhookEnabled" type="checkbox" class="h-4 w-4" />
+                  Aktif
+                </label>
+              </div>
+              <div class="mt-3">
+                <label class="text-xs text-slate-500">Webhook URL</label>
+                <input id="orderWebhookUrl" class="mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm font-mono" placeholder="https://..." />
+                <div class="mt-2 text-xs text-slate-500">Endpoint harus menerima <span class="font-mono">Content-Type: application/json</span> dan mengizinkan CORS.</div>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <button id="testOrderWebhookBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-white">Test Webhook</button>
+                <button id="saveOrderWebhookBtn" class="rounded-xl bg-emerald-600 px-3 py-2 text-sm font-bold text-white hover:bg-emerald-700">Simpan Setting</button>
+              </div>
+              <div id="orderWebhookStatus" class="mt-3 text-xs text-slate-600">Status: <span class="font-semibold">Nonaktif</span></div>
+
+              <details class="mt-3 rounded-xl border bg-white p-3">
+                <summary class="cursor-pointer text-sm font-extrabold text-slate-900">Contoh Webhook URL & cara membuat (klik)</summary>
+                <div class="mt-2 space-y-3 text-xs text-slate-700">
+                  <div class="rounded-lg border bg-slate-50 p-3">
+                    <div class="font-bold">Webhook URL itu apa?</div>
+                    <div class="mt-1">Isilah dengan <b>URL endpoint server</b> (HTTPS) yang kamu miliki / kamu buat, yang bisa menerima <span class="font-mono">POST</span> JSON dan mengizinkan <b>CORS</b>. Saat customer checkout, web akan mengirim payload order ke URL ini.</div>
+                  </div>
+
+                  <div class="rounded-lg border bg-slate-50 p-3">
+                    <div class="font-bold">Opsi 1 (paling cepat): Pipedream Webhook</div>
+                    <ol class="mt-1 list-decimal pl-5 space-y-1">
+                      <li>Buka <a class="font-semibold text-emerald-700 underline" target="_blank" href="https://pipedream.com/new">pipedream.com/new</a></li>
+                      <li>Pilih trigger <b>HTTP / Webhook</b></li>
+                      <li>Pipedream akan memberi URL seperti <span class="font-mono">https://eo....m.pipedream.net</span></li>
+                      <li>Paste URL itu ke field <b>Webhook URL</b> di sini</li>
+                      <li>Klik <b>Test Webhook</b> lalu <b>Aktif</b></li>
+                    </ol>
+                  </div>
+
+                  <div class="rounded-lg border bg-slate-50 p-3">
+                    <div class="font-bold">Opsi 2: Make.com (Integromat) Custom Webhook</div>
+                    <ol class="mt-1 list-decimal pl-5 space-y-1">
+                      <li>Buat scenario baru di Make</li>
+                      <li>Tambahkan module <b>Webhooks → Custom webhook</b></li>
+                      <li>Copy webhook URL yang diberikan Make</li>
+                      <li>Paste ke field <b>Webhook URL</b> di sini</li>
+                    </ol>
+                  </div>
+
+                  <div class="rounded-lg border bg-slate-50 p-3">
+                    <div class="font-bold">Opsi 3: n8n Webhook</div>
+                    <ol class="mt-1 list-decimal pl-5 space-y-1">
+                      <li>Buat workflow baru di n8n</li>
+                      <li>Tambah node <b>Webhook</b> (method: POST)</li>
+                      <li>Gunakan <b>Production URL</b> dari node webhook</li>
+                      <li>Paste ke field <b>Webhook URL</b> di sini</li>
+                    </ol>
+                  </div>
+
+                  <div class="rounded-lg border bg-slate-50 p-3">
+                    <div class="font-bold">Opsi 4: Server sendiri (contoh Node/Express)</div>
+                    <div class="mt-1 text-slate-600">Kalau kamu punya hosting/VPS, URL-nya biasanya seperti <span class="font-mono">https://domainkamu.com/api/order</span>.</div>
+                    <pre class="mt-2 overflow-auto rounded-lg border bg-white p-2 text-[11px]"><code>import express from 'express';
+const app = express();
+app.use(express.json());
+
+app.post('/api/order', (req, res) => {
+  console.log('order masuk:', req.body);
+  res.set('Access-Control-Allow-Origin', '*');
+  res.json({ ok: true });
+});
+
+app.options('/api/order', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.sendStatus(204);
+});
+
+app.listen(3000);</code></pre>
+                  </div>
+
+                  <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-900">
+                    <div class="font-extrabold">Catatan penting: CORS</div>
+                    <div class="mt-1">Jika Webhook URL kamu tidak mengizinkan CORS, tombol <b>Test Webhook</b> atau kirim order saat checkout akan gagal. Pipedream/Make/n8n biasanya sudah aman untuk CORS.</div>
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <div class="lg:col-span-4 rounded-2xl border bg-slate-50 p-4">
+              <div class="text-sm font-extrabold">Format payload (ringkas)</div>
+              <pre class="mt-2 overflow-auto rounded-xl border bg-white p-3 text-xs text-slate-800"><code>{
+  "event": "order.created",
+  "shopId": "varsha-shop-01",
+  "deviceId": "DEV-...",
+  "sentAt": "2025-...",
+  "tx": { "id": "TX-...", "buyerName": "...", "total": 12345, "items": [...] }
+}</code></pre>
+              <div class="mt-2 text-xs text-slate-500">Catatan: Webhook ini <b>tidak otomatis sinkron</b> semua data antar gadget, tapi cocok untuk “masuk server” dan diproses admin lewat sistem lain.</div>
             </div>
           </div>
         </div>
@@ -740,9 +876,15 @@
               <pre class="mt-2 overflow-auto rounded-xl border bg-white p-3 text-xs text-slate-800"><code id="firestoreRulesSample">rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Allow Varsha Cloud Sync doc
     match /varsha_shops/{shopId} {
-      // Demo: allow authenticated users
+      // Anonymous auth counts as authenticated
       allow read, write: if request.auth != null;
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }</code></pre>
@@ -890,7 +1032,10 @@ service firebase.storage {
           </div>
         </div>
         <div class="flex items-center justify-between gap-2 pt-2">
-          <button id="deleteProductBtn" type="button" class="hidden rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-bold text-rose-700 hover:bg-rose-100">Hapus</button>
+          <div class="flex items-center gap-2">
+            <button id="deleteProductBtn" type="button" class="hidden rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-bold text-rose-700 hover:bg-rose-100">Hapus</button>
+            <button id="pushProductCloudBtn" type="button" class="hidden rounded-xl border border-sky-200 bg-sky-50 px-4 py-2 text-sm font-bold text-sky-700 hover:bg-sky-100" title="Kirim snapshot data ke Cloud Sync">Push (Kirim ke Cloud)</button>
+          </div>
           <div class="ml-auto flex gap-2">
             <button type="button" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50" data-close="productModal">Batal</button>
             <button type="submit" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Simpan</button>
@@ -1012,7 +1157,9 @@ service firebase.storage {
       cloudShopId: 'varsha_cloud_shop_id',
       cloudEnabled: 'varsha_cloud_enabled',
       deviceId: 'varsha_device_id',
-      lastSeenTxId: 'varsha_last_seen_tx_id'
+      lastSeenTxId: 'varsha_last_seen_tx_id',
+      orderWebhookUrl: 'varsha_order_webhook_url',
+      orderWebhookEnabled: 'varsha_order_webhook_enabled'
     };
 
     function load(key, fallback) {
@@ -1182,6 +1329,11 @@ service firebase.storage {
         btn.classList.toggle('hover:bg-slate-800', btn.dataset.route === route);
       });
       document.getElementById('mobileNav').classList.add('hidden');
+
+      // Auto-pull when entering admin views (per request)
+      if (String(route || '').startsWith('admin.')) {
+        cloudAutoPullIfNeeded(`route:${route}`);
+      }
 
       // render on route
       if (route === 'market') renderMarketplace();
@@ -1475,6 +1627,11 @@ service firebase.storage {
     function openCheckout() {
       const items = cartDetailed();
       if (items.length === 0) return toast('Keranjang masih kosong.');
+
+      // Auto-connect cloud in background so confirm checkout can push immediately
+      // (Works if Firebase config + Shop ID already saved)
+      try { cloudEnsureConnected({ silent: true, forceConnect: true }); } catch {}
+
       document.getElementById('checkoutModal').classList.remove('hidden');
       document.getElementById('buyerName').focus();
     }
@@ -1486,77 +1643,80 @@ service firebase.storage {
     function doCheckout({ name, address }) {
       const items = cartDetailed();
       if (items.length === 0) return;
-      const products = getProducts();
 
-      // validate stock
-      for (const it of items) {
-        const p = products.find(x => x.id === it.productId);
-        if (!p || p.stock < it.qty) {
-          toast('Stok berubah. Silakan cek keranjang.');
-          renderCart();
-          renderMarketplace();
-          return;
+      // For multi-device consistency: pull -> validate -> write -> push
+      cloudSyncWrite(() => {
+        const products = getProducts();
+
+        // validate stock against latest local (which is already pulled)
+        for (const it of items) {
+          const p = products.find(x => x.id === it.productId);
+          if (!p || p.stock < it.qty) {
+            toast('Stok berubah. Silakan cek keranjang.');
+            renderCart();
+            renderMarketplace();
+            throw new Error('stock_changed');
+          }
         }
-      }
 
-      // compute totals
-      let total = 0;
-      let profit = 0;
-      const txItems = items.map(it => {
-        const revenue = it.qty * it.priceUnit;
-        const cost = it.qty * Number(it.priceBuy || 0);
-        total += revenue;
-        profit += (revenue - cost);
-        return {
-          productId: it.productId,
-          name: it.name,
-          qty: it.qty,
-          unitPrice: it.priceUnit,
-          discountPct: it.promoOn ? it.discountPct : 0,
-          unitSellBase: it.priceSellBase,
-          unitBuy: it.priceBuy,
-          revenue,
-          cost
+        // compute totals
+        let total = 0;
+        let profit = 0;
+        const txItems = items.map(it => {
+          const revenue = it.qty * it.priceUnit;
+          const cost = it.qty * Number(it.priceBuy || 0);
+          total += revenue;
+          profit += (revenue - cost);
+          return {
+            productId: it.productId,
+            name: it.name,
+            qty: it.qty,
+            unitPrice: it.priceUnit,
+            discountPct: it.promoOn ? it.discountPct : 0,
+            unitSellBase: it.priceSellBase,
+            unitBuy: it.priceBuy,
+            revenue,
+            cost
+          };
+        });
+
+        // update stock
+        for (const it of items) {
+          const p = products.find(x => x.id === it.productId);
+          p.stock = Math.max(0, Number(p.stock || 0) - it.qty);
+        }
+        setProducts(products);
+
+        // record transaction
+        const tx = {
+          id: uid('TX'),
+          date: new Date().toISOString(),
+          buyerName: name,
+          buyerAddress: address,
+          total,
+          profit,
+          items: txItems
         };
+        const txs = getTransactions();
+        txs.unshift(tx);
+        setTransactions(txs);
+
+        // clear cart
+        setCart([]);
+
+        toast('Checkout sukses! Transaksi tercatat.');
+
+        // Alternative to Firebase: send order webhook (non-blocking)
+        try { sendOrderWebhook(tx); } catch {}
+
+        closeModal('checkoutModal');
+        closeCart();
+        rerenderAll();
+        routeTo('admin.dashboard');
+      }, { reason: 'checkout' }).catch((e) => {
+        if (String(e?.message || '') === 'stock_changed') return;
+        console.warn(e);
       });
-
-      // update stock
-      for (const it of items) {
-        const p = products.find(x => x.id === it.productId);
-        p.stock = Math.max(0, Number(p.stock || 0) - it.qty);
-      }
-      setProducts(products);
-
-      // record transaction
-      const tx = {
-        id: uid('TX'),
-        date: new Date().toISOString(),
-        buyerName: name,
-        buyerAddress: address,
-        total,
-        profit,
-        items: txItems
-      };
-      const txs = getTransactions();
-      txs.unshift(tx);
-      setTransactions(txs);
-
-      // clear cart
-      setCart([]);
-
-      toast('Checkout sukses! Transaksi tercatat.');
-
-      // If cloud is enabled, push immediately so admin devices see the order right away
-      const enabled = !!load(LS.cloudEnabled, false);
-      const shopId = load(LS.cloudShopId, '');
-      if (enabled && cloud.connected && shopId) {
-        cloudPush(shopId).catch(() => {});
-      }
-
-      closeModal('checkoutModal');
-      closeCart();
-      rerenderAll();
-      routeTo('admin.dashboard');
     }
 
     /**********************
@@ -1619,6 +1779,7 @@ service firebase.storage {
 
       const title = document.getElementById('productModalTitle');
       const delBtn = document.getElementById('deleteProductBtn');
+      const pushBtn = document.getElementById('pushProductCloudBtn');
 
       // reset upload UI
       const fileEl = document.getElementById('productImageFile');
@@ -1640,6 +1801,7 @@ service firebase.storage {
       if (!productId) {
         title.textContent = 'Tambah Produk';
         delBtn.classList.add('hidden');
+        if (pushBtn) pushBtn.classList.add('hidden');
         document.getElementById('productId').value = '';
         document.getElementById('productName').value = '';
         document.getElementById('productCategory').value = 'Lokal';
@@ -1656,6 +1818,7 @@ service firebase.storage {
       if (!p) return;
       title.textContent = 'Edit Produk';
       delBtn.classList.remove('hidden');
+      if (pushBtn) pushBtn.classList.remove('hidden');
 
       document.getElementById('productId').value = p.id;
       document.getElementById('productName').value = p.name;
@@ -1668,49 +1831,73 @@ service firebase.storage {
 
       delBtn.onclick = () => {
         if (!confirm('Hapus produk ini?')) return;
-        const products = getProducts().filter(x => x.id !== p.id);
-        setProducts(products);
-        toast('Produk dihapus.');
-        closeModal('productModal');
-        rerenderAll();
-        routeTo('admin.products');
+        cloudSyncWrite(() => {
+          const products = getProducts().filter(x => x.id !== p.id);
+          setProducts(products);
+          toast('Produk dihapus.');
+          closeModal('productModal');
+          rerenderAll();
+          routeTo('admin.products');
+        }, { reason: 'deleteProduct' }).catch((e) => console.warn(e));
       };
+
+      // Manual push button (quick send snapshot to cloud)
+      if (pushBtn) {
+        pushBtn.onclick = async () => {
+          const enabled = !!load(LS.cloudEnabled, false);
+          const shopId = String(load(LS.cloudShopId, '') || '').trim();
+          if (!enabled) return toast('Cloud Sync belum aktif. Buka menu Laporan → Cloud Sync → Connect.');
+          if (!cloud.connected) return toast('Cloud belum connect. Buka menu Laporan → Cloud Sync → Connect.');
+          if (!shopId) return toast('Shop ID belum diisi.');
+
+          try {
+            pushBtn.disabled = true;
+            pushBtn.classList.add('opacity-60');
+            pushBtn.textContent = 'Pushing...';
+            await cloudPush(shopId, { silent: false });
+            hideCloudError();
+          } catch (e) {
+            console.warn(e);
+            toast('Gagal push ke cloud. Lihat detail di menu Laporan.');
+            showCloudError(e);
+          } finally {
+            pushBtn.disabled = false;
+            pushBtn.classList.remove('opacity-60');
+            pushBtn.textContent = 'Push (Kirim ke Cloud)';
+          }
+        };
+      }
     }
 
     function upsertProduct(formData) {
-      const products = getProducts();
-      const id = formData.id || uid('PRD');
-      const existing = products.find(p => p.id === id);
-      const payload = {
-        id,
-        name: formData.name.trim(),
-        category: formData.category,
-        stock: Math.max(0, Number(formData.stock || 0)),
-        priceBuy: Math.max(0, Number(formData.priceBuy || 0)),
-        priceSell: Math.max(0, Number(formData.priceSell || 0)),
-        image: formData.image.trim(),
-        promo: existing?.promo || { active: false, discountPct: 0, start: '', end: '' }
-      };
+      cloudSyncWrite(() => {
+        const products = getProducts();
+        const id = formData.id || uid('PRD');
+        const existing = products.find(p => p.id === id);
+        const payload = {
+          id,
+          name: formData.name.trim(),
+          category: formData.category,
+          stock: Math.max(0, Number(formData.stock || 0)),
+          priceBuy: Math.max(0, Number(formData.priceBuy || 0)),
+          priceSell: Math.max(0, Number(formData.priceSell || 0)),
+          image: formData.image.trim(),
+          promo: existing?.promo || { active: false, discountPct: 0, start: '', end: '' }
+        };
 
-      if (existing) {
-        Object.assign(existing, payload);
-        toast('Produk diperbarui.');
-      } else {
-        products.unshift(payload);
-        toast('Produk ditambahkan.');
-      }
-      setProducts(products);
+        if (existing) {
+          Object.assign(existing, payload);
+          toast('Produk diperbarui.');
+        } else {
+          products.unshift(payload);
+          toast('Produk ditambahkan.');
+        }
+        setProducts(products);
 
-      // push segera agar perubahan (termasuk URL gambar) langsung tersinkron ke gadget lain
-      const enabled = !!load(LS.cloudEnabled, false);
-      const shopId = load(LS.cloudShopId, '');
-      if (enabled && cloud.connected && shopId) {
-        cloudPush(shopId, { silent: true }).catch(() => {});
-      }
-
-      closeModal('productModal');
-      rerenderAll();
-      routeTo('admin.products');
+        closeModal('productModal');
+        rerenderAll();
+        routeTo('admin.products');
+      }, { reason: 'upsertProduct' }).catch((e) => console.warn(e));
     }
 
     /**********************
@@ -1774,34 +1961,36 @@ service firebase.storage {
     }
 
     function addPurchase({ productId, qty, buyPrice, sellPrice }) {
-      const products = getProducts();
-      const p = products.find(x => x.id === productId);
-      if (!p) return toast('Produk tidak ditemukan.');
-      const q = clamp(Number(qty || 0), 1, 1e9);
-      const bp = Math.max(0, Number(buyPrice || 0));
-      const sp = sellPrice !== '' && sellPrice !== null && sellPrice !== undefined ? Math.max(0, Number(sellPrice || 0)) : null;
-      if (!bp) return toast('Harga beli harus diisi.');
+      cloudSyncWrite(() => {
+        const products = getProducts();
+        const p = products.find(x => x.id === productId);
+        if (!p) return toast('Produk tidak ditemukan.');
+        const q = clamp(Number(qty || 0), 1, 1e9);
+        const bp = Math.max(0, Number(buyPrice || 0));
+        const sp = sellPrice !== '' && sellPrice !== null && sellPrice !== undefined ? Math.max(0, Number(sellPrice || 0)) : null;
+        if (!bp) return toast('Harga beli harus diisi.');
 
-      p.stock = Number(p.stock || 0) + q;
-      p.priceBuy = bp;
-      if (sp !== null) p.priceSell = sp;
-      setProducts(products);
+        p.stock = Number(p.stock || 0) + q;
+        p.priceBuy = bp;
+        if (sp !== null) p.priceSell = sp;
+        setProducts(products);
 
-      const purchases = getPurchases();
-      purchases.unshift({
-        id: uid('BUY'),
-        date: new Date().toISOString(),
-        productId,
-        productName: p.name,
-        qty: q,
-        buyPrice: bp,
-        sellPrice: sp
-      });
-      setPurchases(purchases);
+        const purchases = getPurchases();
+        purchases.unshift({
+          id: uid('BUY'),
+          date: new Date().toISOString(),
+          productId,
+          productName: p.name,
+          qty: q,
+          buyPrice: bp,
+          sellPrice: sp
+        });
+        setPurchases(purchases);
 
-      toast('Pembelian tersimpan & stok terupdate.');
-      rerenderAll();
-      routeTo('admin.purchases');
+        toast('Pembelian tersimpan & stok terupdate.');
+        rerenderAll();
+        routeTo('admin.purchases');
+      }, { reason: 'purchase' }).catch((e) => console.warn(e));
     }
 
     /**********************
@@ -1864,31 +2053,35 @@ service firebase.storage {
     }
 
     function savePromo({ productId, discountPct, start, end, active }) {
-      const products = getProducts();
-      const p = products.find(x => x.id === productId);
-      if (!p) return;
-      const pct = clamp(Number(discountPct || 0), 0, 90);
-      p.promo = {
-        active: !!active,
-        discountPct: pct,
-        start: start || '',
-        end: end || ''
-      };
-      setProducts(products);
-      toast('Promo disimpan.');
-      rerenderAll();
-      routeTo('admin.promos');
+      cloudSyncWrite(() => {
+        const products = getProducts();
+        const p = products.find(x => x.id === productId);
+        if (!p) return;
+        const pct = clamp(Number(discountPct || 0), 0, 90);
+        p.promo = {
+          active: !!active,
+          discountPct: pct,
+          start: start || '',
+          end: end || ''
+        };
+        setProducts(products);
+        toast('Promo disimpan.');
+        rerenderAll();
+        routeTo('admin.promos');
+      }, { reason: 'savePromo' }).catch((e) => console.warn(e));
     }
 
     function clearPromo(productId) {
-      const products = getProducts();
-      const p = products.find(x => x.id === productId);
-      if (!p) return;
-      p.promo = { active: false, discountPct: 0, start: '', end: '' };
-      setProducts(products);
-      toast('Promo dihapus.');
-      rerenderAll();
-      routeTo('admin.promos');
+      cloudSyncWrite(() => {
+        const products = getProducts();
+        const p = products.find(x => x.id === productId);
+        if (!p) return;
+        p.promo = { active: false, discountPct: 0, start: '', end: '' };
+        setProducts(products);
+        toast('Promo dihapus.');
+        rerenderAll();
+        routeTo('admin.promos');
+      }, { reason: 'clearPromo' }).catch((e) => console.warn(e));
     }
 
     /**********************
@@ -2266,8 +2459,105 @@ service firebase.storage {
         shopEl.value = shopId || 'varsha-shop-01';
       }
 
+      // populate webhook settings
+      const whUrlEl = document.getElementById('orderWebhookUrl');
+      const whEnEl = document.getElementById('orderWebhookEnabled');
+      if (whUrlEl && !whUrlEl.value) whUrlEl.value = load(LS.orderWebhookUrl, '') || '';
+      if (whEnEl) whEnEl.checked = !!load(LS.orderWebhookEnabled, false);
+      updateOrderWebhookStatusUI();
+
       // If already connected, keep the live status (do not overwrite to Ready)
       if (!cloud.connected) updateCloudStatusUI(enabled ? 'Ready (saved config)' : 'Offline');
+    }
+
+    /**********************
+     * Order Webhook (Alternative to Firebase)
+     **********************/
+    function getOrderWebhookSettings() {
+      return {
+        enabled: !!load(LS.orderWebhookEnabled, false),
+        url: String(load(LS.orderWebhookUrl, '') || '').trim()
+      };
+    }
+
+    function updateOrderWebhookStatusUI(textOverride = '') {
+      const el = document.getElementById('orderWebhookStatus');
+      if (!el) return;
+      if (textOverride) {
+        el.innerHTML = `Status: <span class="font-semibold">${textOverride}</span>`;
+        return;
+      }
+      const s = getOrderWebhookSettings();
+      if (!s.enabled) {
+        el.innerHTML = `Status: <span class="font-semibold">Nonaktif</span>`;
+        return;
+      }
+      if (!s.url) {
+        el.innerHTML = `Status: <span class="font-semibold">Aktif (URL kosong)</span>`;
+        return;
+      }
+      el.innerHTML = `Status: <span class="font-semibold">Aktif</span> • <span class="font-mono break-all">${s.url}</span>`;
+    }
+
+    async function postJsonWithTimeout(url, payload, { timeoutMs = 8000 } = {}) {
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+          mode: 'cors'
+        });
+        const text = await res.text().catch(() => '');
+        if (!res.ok) {
+          throw new Error(`Webhook HTTP ${res.status} ${res.statusText}${text ? ' | ' + text.slice(0, 300) : ''}`);
+        }
+        return { ok: true, status: res.status, text };
+      } finally {
+        clearTimeout(t);
+      }
+    }
+
+    function buildWebhookPayload(event, tx = null) {
+      const shopId = String(load(LS.cloudShopId, '') || '').trim() || 'varsha-shop-01';
+      return {
+        event,
+        shopId,
+        deviceId: getOrCreateDeviceId(),
+        sentAt: new Date().toISOString(),
+        tx
+      };
+    }
+
+    async function sendOrderWebhook(tx) {
+      const s = getOrderWebhookSettings();
+      if (!s.enabled) return;
+      if (!s.url) {
+        updateOrderWebhookStatusUI('Aktif (URL kosong)');
+        return;
+      }
+
+      const payload = buildWebhookPayload('order.created', tx);
+      try {
+        updateOrderWebhookStatusUI('Mengirim...');
+        await postJsonWithTimeout(s.url, payload, { timeoutMs: 9000 });
+        updateOrderWebhookStatusUI('Terkirim');
+        // bring it back to active view after a moment
+        setTimeout(() => updateOrderWebhookStatusUI(), 1200);
+      } catch (e) {
+        console.warn('Order webhook failed', e);
+        updateOrderWebhookStatusUI('Gagal kirim');
+        setTimeout(() => updateOrderWebhookStatusUI(), 1800);
+      }
+    }
+
+    async function testOrderWebhook() {
+      const s = getOrderWebhookSettings();
+      if (!s.url) throw new Error('Webhook URL masih kosong.');
+      const payload = buildWebhookPayload('ping', null);
+      return postJsonWithTimeout(s.url, payload, { timeoutMs: 9000 });
     }
 
     /**********************
@@ -2278,7 +2568,11 @@ service firebase.storage {
       db: null,
       auth: null,
       storage: null,
+      projectId: '',
+      shopId: '',
+      rawBucket: '',
       bucket: '',
+      bucketCandidates: [],
       unsub: null,
       connected: false,
       applyingRemote: false,
@@ -2286,12 +2580,177 @@ service firebase.storage {
       lastLocalPushedHash: null
     };
 
-    function cloudStorageRef(path) {
+    // Sync helpers: serialize pull/push to avoid race conditions
+    const cloudSync = {
+      chain: Promise.resolve(),
+      lastAutoPullAt: 0,
+      autoPullCooldownMs: 4000,
+      suppressAutoPullUntil: 0
+    };
+
+    function cloudRunExclusive(fn) {
+      cloudSync.chain = cloudSync.chain.then(fn, fn);
+      return cloudSync.chain;
+    }
+
+    async function cloudEnsureConnected({ silent = true, forceConnect = false } = {}) {
+      const cfgText = String(load(LS.cloudConfig, '') || '').trim();
+      const shopId = String(load(LS.cloudShopId, '') || '').trim();
+      if (!cfgText || !shopId) return { ok: false, reason: 'no_config', shopId: '' };
+
+      // Per request: jika config + Shop ID sudah tersimpan, Cloud Sync dianggap aktif
+      // (jadi tidak perlu menekan tombol Connect setiap kali).
+      save(LS.cloudEnabled, true);
+
+      if (cloud.connected) return { ok: true, shopId };
+      try {
+        await cloudConnect({ configText: cfgText, shopId });
+        if (!silent) toast('Cloud sync tersambung.');
+        hideCloudError();
+        return { ok: true, shopId };
+      } catch (e) {
+        console.warn('Auto-connect failed', e);
+        updateCloudStatusUI('Offline (auto-connect gagal)');
+        showCloudError(e);
+        return { ok: false, reason: 'connect_failed', shopId };
+      }
+    }
+
+    async function cloudAutoPullIfNeeded(reason = '') {
+      const now = Date.now();
+      if (now < cloudSync.suppressAutoPullUntil) return;
+      if (now - cloudSync.lastAutoPullAt < cloudSync.autoPullCooldownMs) return;
+
+      cloudSync.lastAutoPullAt = now;
+      return cloudRunExclusive(async () => {
+        const c = await cloudEnsureConnected({ silent: true });
+        if (!c.ok || !c.shopId) return;
+
+        try {
+          const res = await cloudPull(c.shopId, { silent: true, noRoute: true, noToastEmpty: true });
+          // If cloud is empty (first device), push local snapshot as baseline
+          if (res?.empty) {
+            await cloudPush(c.shopId, { silent: true });
+          }
+        } catch (e) {
+          console.warn('Auto-pull failed', reason, e);
+          showCloudError(e);
+        }
+      });
+    }
+
+    async function cloudSyncWrite(actionFn, { reason = 'write' } = {}) {
+      // Pull -> apply local change -> push
+      return cloudRunExclusive(async () => {
+        // Always attempt connect automatically (if config + Shop ID already saved)
+        const c = await cloudEnsureConnected({ silent: true, forceConnect: true });
+        if (!c.ok || !c.shopId) {
+          // no cloud config, just run locally
+          return actionFn();
+        }
+
+        // Prevent immediate auto-pull caused by routeTo() after this write
+        cloudSync.suppressAutoPullUntil = Date.now() + 2500;
+
+        // Pause auto-push debounce to avoid double pushes
+        if (typeof cloudAuto !== 'undefined') cloudAuto.disabled = (cloudAuto.disabled || 0) + 1;
+
+        try {
+          // Always pull latest first (per request)
+          try {
+            const res = await cloudPull(c.shopId, { silent: true, noRoute: true, noToastEmpty: true });
+            if (res?.empty) {
+              // If cloud empty, push current local baseline first
+              await cloudPush(c.shopId, { silent: true });
+            }
+          } catch (e) {
+            console.warn('Pre-write pull failed', reason, e);
+            // Continue with local write anyway
+          }
+
+          // Apply local write
+          const out = await actionFn();
+
+          // Push latest snapshot
+          try {
+            await cloudPush(c.shopId, { silent: true });
+          } catch (e) {
+            console.warn('Post-write push failed', reason, e);
+            toast('Gagal push ke cloud. Cek koneksi/rules.');
+            showCloudError(e);
+          }
+
+          return out;
+        } finally {
+          if (typeof cloudAuto !== 'undefined') cloudAuto.disabled = Math.max(0, (cloudAuto.disabled || 0) - 1);
+        }
+      });
+    }
+
+    function buildBucketCandidates(config) {
+      const pid = String(config?.projectId || '').trim();
+      const raw = String(config?.storageBucket || '').trim();
+      const out = [];
+      const push = (v) => {
+        const s = String(v || '').trim();
+        if (!s) return;
+        if (!out.includes(s)) out.push(s);
+      };
+
+      const appspot = pid ? `${pid}.appspot.com` : '';
+      const fireDomain = pid ? `${pid}.firebasestorage.app` : '';
+
+      // Priority: if raw ends with .firebasestorage.app, try classic appspot first (most common gs:// bucket)
+      if (raw && raw.endsWith('.firebasestorage.app')) {
+        push(appspot);
+        push(raw);
+      } else {
+        push(raw);
+        push(appspot);
+      }
+      push(fireDomain);
+      return out.filter(Boolean);
+    }
+
+    function cloudStorageRef(path, bucketOverride = '') {
       if (!cloud.storage) throw new Error('Storage belum siap');
-      const bucket = String(cloud.bucket || '').trim();
+      const bucket = String(bucketOverride || cloud.bucket || '').trim();
       // Prefer refFromURL so we can explicitly target the right bucket.
       if (bucket) return cloud.storage.refFromURL(`gs://${bucket}/${path}`);
       return cloud.storage.ref().child(path);
+    }
+
+    function awaitPutTask(task, { timeoutMs = 12000, onProgress } = {}) {
+      return new Promise((resolve, reject) => {
+        let lastAt = Date.now();
+        let lastTransferred = 0;
+
+        const watchdog = setInterval(() => {
+          if (Date.now() - lastAt > timeoutMs) {
+            clearInterval(watchdog);
+            try { task.cancel(); } catch {}
+            reject(new Error('Upload macet (tidak ada progress).'));
+          }
+        }, 1200);
+
+        task.on('state_changed',
+          (snap) => {
+            if (typeof onProgress === 'function') onProgress(snap);
+            if (snap.bytesTransferred !== lastTransferred) {
+              lastTransferred = snap.bytesTransferred;
+              lastAt = Date.now();
+            }
+          },
+          (err) => {
+            clearInterval(watchdog);
+            reject(err);
+          },
+          () => {
+            clearInterval(watchdog);
+            resolve(task.snapshot);
+          }
+        );
+      });
     }
 
     function guessExtFromFile(file) {
@@ -2303,6 +2762,56 @@ service firebase.storage {
       if (type.includes('webp')) return 'webp';
       if (type.includes('jpg') || type.includes('jpeg')) return 'jpg';
       return 'jpg';
+    }
+
+    async function cloudPickWorkingBucket(shopId, { timeoutMs = 9000 } = {}) {
+      const sid = (shopId || load(LS.cloudShopId, '') || '').trim();
+      if (!sid) throw new Error('Shop ID harus diisi.');
+      if (!cloud.connected) throw new Error('Belum connect Cloud Sync.');
+
+      // Ensure auth
+      if (!cloud.auth?.currentUser) {
+        await cloud.auth.signInAnonymously();
+      }
+      try { await cloud.auth.currentUser.getIdToken(true); } catch {}
+
+      const candidates = Array.isArray(cloud.bucketCandidates) && cloud.bucketCandidates.length
+        ? cloud.bucketCandidates.slice()
+        : (cloud.projectId ? [cloud.rawBucket, `${cloud.projectId}.appspot.com`, `${cloud.projectId}.firebasestorage.app`] : [cloud.rawBucket]).filter(Boolean);
+
+      // If cloud.bucket is set, try it first
+      const ordered = [];
+      const push = (b) => {
+        const s = String(b || '').trim();
+        if (!s) return;
+        if (!ordered.includes(s)) ordered.push(s);
+      };
+      push(cloud.bucket);
+      candidates.forEach(push);
+
+      const deviceId = getOrCreateDeviceId();
+      const filename = `bucket_probe_${Date.now()}_${deviceId}.txt`;
+      const storagePath = `varsha_shops/${sid}/product_images/${filename}`;
+      const blob = new Blob([new TextEncoder().encode('ok')], { type: 'text/plain' });
+
+      const errors = [];
+      for (const b of ordered) {
+        try {
+          const ref = cloudStorageRef(storagePath, b);
+          const task = ref.put(blob, { contentType: 'text/plain', cacheControl: 'no-cache' });
+          await awaitPutTask(task, { timeoutMs });
+          // cleanup (best effort)
+          try { await ref.delete(); } catch {}
+
+          cloud.bucket = b;
+          return { bucket: b, storagePath };
+        } catch (e) {
+          errors.push({ bucket: b, err: e });
+        }
+      }
+
+      const summary = errors.map(x => `${x.bucket}: ${String(x.err?.code || x.err?.message || x.err)}`).join(' || ');
+      throw new Error('Tidak bisa upload ke Firebase Storage di semua kandidat bucket. ' + (summary ? ('Detail: ' + summary) : ''));
     }
 
     async function uploadProductImageToCloud({ file, productId }) {
@@ -2325,6 +2834,11 @@ service firebase.storage {
       const maxMb = 3.5;
       if (file.size > maxMb * 1024 * 1024) throw new Error(`Ukuran file terlalu besar. Maks ${maxMb} MB.`);
 
+      // pick a working bucket first (helps with macet 0%)
+      if (!cloud.bucket) {
+        await cloudPickWorkingBucket(shopId, { timeoutMs: 9000 });
+      }
+
       const deviceId = getOrCreateDeviceId();
       const ext = guessExtFromFile(file);
       const safeProductId = (productId || uid('PRD')).replaceAll('/', '_');
@@ -2346,44 +2860,26 @@ service firebase.storage {
       const ref = cloudStorageRef(storagePath);
       const task = ref.put(file, meta);
 
-      return await new Promise((resolve, reject) => {
-        let lastProgressAt = Date.now();
-        let lastTransferred = 0;
-
-        const watchdog = setInterval(() => {
-          const stuckMs = Date.now() - lastProgressAt;
-          if (stuckMs > 12000) {
-            clearInterval(watchdog);
-            try { task.cancel(); } catch {}
-            reject(new Error('Upload macet (tidak ada progress). Cek: (1) Firebase Storage sudah diaktifkan, (2) Storage Rules mengizinkan write, (3) bucket benar.'));
-          }
-        }, 1500);
-
-        task.on('state_changed',
-          (snap) => {
-            const pct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
-            if (bar) bar.style.width = pct + '%';
-            if (txt) txt.textContent = pct + '%';
-            if (snap.bytesTransferred !== lastTransferred) {
-              lastTransferred = snap.bytesTransferred;
-              lastProgressAt = Date.now();
-            }
-          },
-          (err) => {
-            clearInterval(watchdog);
-            reject(err);
-          },
-          async () => {
-            clearInterval(watchdog);
-            try {
-              const url = await task.snapshot.ref.getDownloadURL();
-              resolve({ url, storagePath });
-            } catch (e) {
-              reject(e);
-            }
-          }
-        );
+      await awaitPutTask(task, {
+        timeoutMs: 15000,
+        onProgress: (snap) => {
+          const pct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
+          if (bar) bar.style.width = pct + '%';
+          if (txt) txt.textContent = pct + '%';
+        }
       });
+
+      const url = await task.snapshot.ref.getDownloadURL();
+      return { url, storagePath, bucket: cloud.bucket };
+    }
+
+    async function cloudTestStorage(shopId) {
+      if (!cloud.connected) throw new Error('Belum connect Cloud Sync.');
+      const sid = (shopId || load(LS.cloudShopId, '') || '').trim();
+      if (!sid) throw new Error('Shop ID harus diisi.');
+
+      const res = await cloudPickWorkingBucket(sid, { timeoutMs: 9000 });
+      return { ok: true, ...res };
     }
 
     function updateProductImagePreview(url) {
@@ -2545,6 +3041,16 @@ service firebase.storage {
         );
       }
 
+      if (lc.includes('upload') && lc.includes('macet')) {
+        hints.push(
+          `<b>Upload stuck 0% / Test Storage macet:</b> biasanya karena salah satu ini:` +
+          `<br>1) Storage belum diaktifkan (Firebase Console → Storage → Get started),` +
+          `<br>2) Storage Rules menolak write (butuh request.auth != null),` +
+          `<br>3) Bucket salah. Untuk gs:// biasanya bucket yang benar adalah <span class="font-mono">PROJECT_ID.appspot.com</span> (bukan <span class="font-mono">*.firebasestorage.app</span>).` +
+          `<br>Catatan: aplikasi ini akan mencoba beberapa kandidat bucket otomatis saat upload/test.`
+        );
+      }
+
       if (lc.includes('bucket') && (lc.includes('invalid') || lc.includes('does not exist'))) {
         hints.push(
           `<b>Bucket Storage bermasalah:</b> pastikan field <b>storageBucket</b> di firebaseConfig benar.` +
@@ -2654,17 +3160,17 @@ service firebase.storage {
       save(LS.cloudShopId, shopId);
       save(LS.cloudEnabled, true);
 
+      cloud.projectId = String(config.projectId || '').trim();
+      cloud.shopId = String(shopId || '').trim();
+      cloud.rawBucket = String(config.storageBucket || '').trim();
+      cloud.bucketCandidates = buildBucketCandidates(config);
+      // Do not set cloud.bucket here; we will probe on first upload/test.
+
       // init firebase once
       if (!cloud.app) {
         cloud.app = firebase.initializeApp(config);
         cloud.auth = firebase.auth();
         cloud.db = firebase.firestore();
-        const rawBucket = String(config.storageBucket || '').trim();
-        // Many Firebase configs use projectId.appspot.com as bucket name.
-        // Some configs (or copied settings) may contain *.firebasestorage.app which often breaks gs:// refs.
-        cloud.bucket = rawBucket && rawBucket.endsWith('.firebasestorage.app')
-          ? `${config.projectId}.appspot.com`
-          : rawBucket;
         cloud.storage = firebase.storage();
       }
 
@@ -2674,8 +3180,8 @@ service firebase.storage {
       }
 
       cloud.connected = true;
-      const bucketInfo = cloud.bucket ? ` • bucket=${cloud.bucket}` : '';
-      updateCloudStatusUI(`Connected • projectId=${config.projectId}${bucketInfo} • shop=${shopId}`);
+      const bucketInfo = cloud.bucket ? ` • bucket=${cloud.bucket}` : (cloud.rawBucket ? ` • bucket(raw)=${cloud.rawBucket}` : '');
+      updateCloudStatusUI(`Connected • projectId=${cloud.projectId}${bucketInfo} • shop=${cloud.shopId}`);
 
       // set baseline for new order notification
       const currentTx = getTransactions();
@@ -2684,7 +3190,6 @@ service firebase.storage {
       // start realtime listener
       await cloudStartListener(shopId);
 
-      // push once if cloud empty (optional): just show ready
       return true;
     }
 
@@ -2723,28 +3228,29 @@ service firebase.storage {
       updateCloudStatusUI(`Connected • Last push ${new Date().toLocaleTimeString('id-ID')}`);
     }
 
-    async function cloudPull(shopId) {
+    async function cloudPull(shopId, opts = {}) {
       if (!cloud.connected) throw new Error('Belum connect');
       const ref = cloudDocRef(shopId);
       const doc = await ref.get();
       if (!doc.exists) {
-        toast('Cloud masih kosong.');
-        return;
+        if (!opts?.noToastEmpty && !opts?.silent) toast('Cloud masih kosong.');
+        return { empty: true };
       }
       const payload = doc.data();
       const data = payload?.data;
       if (!data) {
-        toast('Data cloud tidak ditemukan.');
-        return;
+        if (!opts?.silent) toast('Data cloud tidak ditemukan.');
+        return { empty: false, applied: false };
       }
       cloud.applyingRemote = true;
       try {
         applySnapshotToLocal(data);
         // baseline last seen tx
         if (Array.isArray(data.transactions) && data.transactions.length) setLastSeenTxId(data.transactions[0].id);
-        toast('Pull dari cloud berhasil.');
+        if (!opts?.silent) toast('Pull dari cloud berhasil.');
         rerenderAll();
-        routeTo(state.route);
+        if (!opts?.noRoute) routeTo(state.route);
+        return { empty: false, applied: true };
       } finally {
         cloud.applyingRemote = false;
       }
@@ -2793,12 +3299,13 @@ service firebase.storage {
     }
 
     // Auto-push on local changes (debounced)
-    const cloudAuto = { t: null };
+    const cloudAuto = { t: null, disabled: 0 };
     function cloudScheduleAutoPush() {
       const enabled = !!load(LS.cloudEnabled, false);
       const shopId = load(LS.cloudShopId, '');
       if (!enabled || !cloud.connected || !shopId) return;
       if (cloud.applyingRemote) return;
+      if ((cloudAuto.disabled || 0) > 0) return;
       clearTimeout(cloudAuto.t);
       cloudAuto.t = setTimeout(async () => {
         try {
@@ -2927,9 +3434,10 @@ service firebase.storage {
             uploadBtn.disabled = true;
             uploadBtn.classList.add('opacity-60');
             uploadBtn.textContent = 'Uploading...';
-            const { url } = await uploadProductImageToCloud({ file, productId: pid });
+            const { url, bucket } = await uploadProductImageToCloud({ file, productId: pid });
             if (urlEl) urlEl.value = url;
             updateProductImagePreview(url);
+            if (bucket) updateCloudStatusUI(`Connected • projectId=${cloud.projectId} • bucket=${bucket} • shop=${cloud.shopId}`);
             toast('Upload gambar berhasil.');
           } catch (e) {
             console.warn(e);
@@ -3087,6 +3595,48 @@ service firebase.storage {
         });
       }
 
+      // Order Webhook (alternative)
+      const orderWebhookEnabledEl = document.getElementById('orderWebhookEnabled');
+      const orderWebhookUrlEl = document.getElementById('orderWebhookUrl');
+      const saveOrderWebhookBtn = document.getElementById('saveOrderWebhookBtn');
+      const testOrderWebhookBtn = document.getElementById('testOrderWebhookBtn');
+
+      if (orderWebhookEnabledEl) orderWebhookEnabledEl.checked = !!load(LS.orderWebhookEnabled, false);
+      if (orderWebhookUrlEl) orderWebhookUrlEl.value = load(LS.orderWebhookUrl, '') || '';
+      updateOrderWebhookStatusUI();
+
+      if (saveOrderWebhookBtn) {
+        saveOrderWebhookBtn.addEventListener('click', () => {
+          const enabled = !!orderWebhookEnabledEl?.checked;
+          const url = String(orderWebhookUrlEl?.value || '').trim();
+          save(LS.orderWebhookEnabled, enabled);
+          save(LS.orderWebhookUrl, url);
+          updateOrderWebhookStatusUI();
+          toast('Setting webhook disimpan.');
+        });
+      }
+
+      if (testOrderWebhookBtn) {
+        testOrderWebhookBtn.addEventListener('click', async () => {
+          try {
+            const enabled = !!orderWebhookEnabledEl?.checked;
+            const url = String(orderWebhookUrlEl?.value || '').trim();
+            save(LS.orderWebhookEnabled, enabled);
+            save(LS.orderWebhookUrl, url);
+            updateOrderWebhookStatusUI('Testing...');
+            await testOrderWebhook();
+            toast('Test webhook sukses.');
+            updateOrderWebhookStatusUI('OK');
+            setTimeout(() => updateOrderWebhookStatusUI(), 1200);
+          } catch (e) {
+            console.warn(e);
+            toast(e?.message || 'Test webhook gagal.');
+            updateOrderWebhookStatusUI('Gagal');
+            setTimeout(() => updateOrderWebhookStatusUI(), 1600);
+          }
+        });
+      }
+
       // Cloud Sync (Firebase)
       const cloudConnectBtn = document.getElementById('cloudConnectBtn');
       const cloudDisconnectBtn = document.getElementById('cloudDisconnectBtn');
@@ -3094,6 +3644,7 @@ service firebase.storage {
       const cloudPushBtn = document.getElementById('cloudPushBtn');
       const cloudFillDefaultBtn = document.getElementById('cloudFillDefaultBtn');
       const cloudClearConfigBtn = document.getElementById('cloudClearConfigBtn');
+      const cloudTestStorageBtn = document.getElementById('cloudTestStorageBtn');
       const cloudShopId = document.getElementById('cloudShopId');
       const cloudConfigJson = document.getElementById('cloudConfigJson');
 
@@ -3170,6 +3721,33 @@ service firebase.storage {
             console.warn(e);
             toast('Gagal push. Lihat detail di menu Laporan.');
             showCloudError(e);
+          }
+        });
+      }
+
+      if (cloudTestStorageBtn) {
+        cloudTestStorageBtn.addEventListener('click', async () => {
+          const shopId = (cloudShopId?.value || load(LS.cloudShopId, '')).trim();
+          if (!shopId) return toast('Shop ID harus diisi.');
+          if (!cloud.connected) return toast('Silakan Connect dulu.');
+          try {
+            cloudTestStorageBtn.disabled = true;
+            cloudTestStorageBtn.classList.add('opacity-60');
+            cloudTestStorageBtn.textContent = 'Testing...';
+            const res = await cloudTestStorage(shopId);
+            hideCloudError();
+            toast('Storage OK (test upload sukses).');
+            // update status with selected bucket
+            if (res?.bucket) updateCloudStatusUI(`Connected • projectId=${cloud.projectId}${res.bucket ? ` • bucket=${res.bucket}` : ''} • shop=${cloud.shopId}`);
+            console.log('Storage test success', res);
+          } catch (e) {
+            console.warn(e);
+            toast('Storage test gagal. Lihat detail di bawah.');
+            showCloudError(e);
+          } finally {
+            cloudTestStorageBtn.disabled = false;
+            cloudTestStorageBtn.classList.remove('opacity-60');
+            cloudTestStorageBtn.textContent = 'Test Storage';
           }
         });
       }
@@ -3252,10 +3830,23 @@ service firebase.storage {
     routeTo('market');
 
     // update header indicator from saved setting
-    updateCloudStatusUI(load(LS.cloudEnabled, false) ? 'Ready (saved config)' : 'Offline');
+    const hasCfg = !!String(load(LS.cloudConfig, '') || '').trim();
+    const hasShop = !!String(load(LS.cloudShopId, '') || '').trim();
+    updateCloudStatusUI((hasCfg && hasShop) ? 'Ready (saved config)' : 'Offline');
 
-    // optional: auto-connect cloud sync if previously enabled
-    cloudInitFromSavedConfig();
+    // Auto-connect on open if config exists (per request)
+    // If connected, do an initial pull (and push if cloud empty)
+    (async () => {
+      try {
+        // Auto-connect on open (if config + Shop ID already saved)
+        const res = await cloudEnsureConnected({ silent: true, forceConnect: true });
+        if (res.ok && res.shopId) {
+          await cloudAutoPullIfNeeded('init');
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+    })();
   </script>
 </body>
 </html>
