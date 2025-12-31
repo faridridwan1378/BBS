@@ -45,7 +45,7 @@
         <button id="brandBtn" type="button" class="flex items-center gap-3 text-left select-none" title="Double click untuk Maintain Profile (Admin)">
           <div class="h-[120px] w-[120px] rounded-3xl overflow-hidden border border-slate-200 bg-white">
             <div id="storeLogoFallback" class="h-full w-full bg-gradient-to-br from-emerald-500 to-lime-400"></div>
-            <img id="storeLogoImg" alt="Logo" class="hidden h-full w-full object-cover" />
+            <img id="storeLogoImg" alt="Logo" class="hidden h-full w-full object-cover" referrerpolicy="no-referrer" decoding="async" loading="eager" />
           </div>
           <div>
             <div id="storeNameHeader" class="text-sm font-semibold leading-4">Varsha</div>
@@ -433,7 +433,7 @@
             <div class="rounded-2xl border p-3">
               <div class="text-xs font-bold text-slate-700">Logo Toko</div>
               <div class="mt-2 flex items-start gap-3">
-                <img id="profileLogoPreview" class="h-[120px] w-[120px] rounded-3xl object-cover border bg-slate-50" alt="Preview" src="https://images.unsplash.com/photo-1541976590-713941681591?auto=format&fit=crop&w=200&q=60" />
+                <img id="profileLogoPreview" class="h-[120px] w-[120px] rounded-3xl object-cover border bg-slate-50" alt="Preview" src="https://images.unsplash.com/photo-1541976590-713941681591?auto=format&fit=crop&w=200&q=60" referrerpolicy="no-referrer" decoding="async" loading="lazy" />
                 <div class="flex-1">
                   <div class="flex flex-col sm:flex-row gap-2">
                     <input id="profileLogoFile" type="file" accept="image/*" class="block w-full text-sm file:mr-3 file:rounded-xl file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-slate-800" />
@@ -475,7 +475,7 @@
             <div class="flex items-center gap-3">
               <div class="h-[120px] w-[120px] rounded-3xl overflow-hidden border bg-white">
                 <div id="profilePreviewLogoFallback" class="h-full w-full bg-gradient-to-br from-emerald-500 to-lime-400"></div>
-                <img id="profilePreviewLogoImg" class="hidden h-full w-full object-cover" alt="Logo" />
+                <img id="profilePreviewLogoImg" class="hidden h-full w-full object-cover" alt="Logo" referrerpolicy="no-referrer" decoding="async" loading="eager" />
               </div>
               <div>
                 <div id="profilePreviewName" class="text-sm font-extrabold">Varsha</div>
@@ -1533,7 +1533,7 @@ service cloud.firestore {
         <div class="flex items-center gap-3">
           <div class="h-[120px] w-[120px] rounded-3xl overflow-hidden border border-slate-200 bg-white">
             <div id="storeLogoAuthFallback" class="h-full w-full bg-gradient-to-br from-emerald-500 to-lime-400"></div>
-            <img id="storeLogoAuthImg" alt="Logo" class="hidden h-full w-full object-cover" />
+            <img id="storeLogoAuthImg" alt="Logo" class="hidden h-full w-full object-cover" referrerpolicy="no-referrer" decoding="async" loading="eager" />
           </div>
           <div>
             <div id="storeNameAuth" class="text-sm font-extrabold leading-4">Varsha</div>
@@ -2370,6 +2370,44 @@ service cloud.firestore {
       save(LS.profile, payload);
     }
 
+    function setImgWithFallback(imgEl, fallbackEl, url) {
+      if (!imgEl || !fallbackEl) return;
+      const u = String(url || '').trim();
+
+      // reset handlers (avoid stacking)
+      imgEl.onload = null;
+      imgEl.onerror = null;
+
+      // Some URLs won't load on mobile due to hotlink/referrer/CORS restrictions.
+      // Strategy: show fallback first, then only hide it after the image loads.
+      if (!u || u.startsWith('blob:') || u.startsWith('file:')) {
+        try { imgEl.removeAttribute('src'); } catch {}
+        imgEl.classList.add('hidden');
+        fallbackEl.classList.remove('hidden');
+        return;
+      }
+
+      // Always show fallback while loading
+      imgEl.classList.add('hidden');
+      fallbackEl.classList.remove('hidden');
+
+      imgEl.onload = () => {
+        imgEl.classList.remove('hidden');
+        fallbackEl.classList.add('hidden');
+      };
+      imgEl.onerror = () => {
+        // Keep fallback visible
+        try { imgEl.removeAttribute('src'); } catch {}
+        imgEl.classList.add('hidden');
+        fallbackEl.classList.remove('hidden');
+      };
+
+      // force reload if same URL
+      const prev = imgEl.getAttribute('src') || '';
+      if (prev !== u) imgEl.setAttribute('src', u);
+      else imgEl.setAttribute('src', u + (u.includes('?') ? '&' : '?') + 'v=' + Date.now());
+    }
+
     function applyStoreProfileToUI() {
       const p = getStoreProfile();
 
@@ -2382,15 +2420,7 @@ service cloud.firestore {
       const logoImg = document.getElementById('storeLogoImg');
       const logoFallback = document.getElementById('storeLogoFallback');
       if (logoImg && logoFallback) {
-        if (p.logoUrl) {
-          logoImg.src = p.logoUrl;
-          logoImg.classList.remove('hidden');
-          logoFallback.classList.add('hidden');
-        } else {
-          logoImg.removeAttribute('src');
-          logoImg.classList.add('hidden');
-          logoFallback.classList.remove('hidden');
-        }
+        setImgWithFallback(logoImg, logoFallback, p.logoUrl);
       }
 
       // Auth modal
@@ -2402,15 +2432,7 @@ service cloud.firestore {
       const logoAuthImg = document.getElementById('storeLogoAuthImg');
       const logoAuthFallback = document.getElementById('storeLogoAuthFallback');
       if (logoAuthImg && logoAuthFallback) {
-        if (p.logoUrl) {
-          logoAuthImg.src = p.logoUrl;
-          logoAuthImg.classList.remove('hidden');
-          logoAuthFallback.classList.add('hidden');
-        } else {
-          logoAuthImg.removeAttribute('src');
-          logoAuthImg.classList.add('hidden');
-          logoAuthFallback.classList.remove('hidden');
-        }
+        setImgWithFallback(logoAuthImg, logoAuthFallback, p.logoUrl);
       }
 
       // Title
@@ -2426,7 +2448,13 @@ service cloud.firestore {
       const img = document.getElementById('profileLogoPreview');
       const fallback = 'https://images.unsplash.com/photo-1541976590-713941681591?auto=format&fit=crop&w=200&q=60';
       if (!img) return;
-      img.src = url || fallback;
+      const u = String(url || '').trim();
+
+      img.onerror = () => {
+        img.src = fallback;
+      };
+
+      img.src = u || fallback;
     }
 
     function applyProfilePreviewFromInputs() {
@@ -2449,15 +2477,8 @@ service cloud.firestore {
       if (pTagline) pTagline.textContent = tagline || DEFAULT_PROFILE.tagline;
 
       if (pLogoImg && pLogoFallback) {
-        if (logoUrl) {
-          pLogoImg.src = logoUrl;
-          pLogoImg.classList.remove('hidden');
-          pLogoFallback.classList.add('hidden');
-        } else {
-          pLogoImg.removeAttribute('src');
-          pLogoImg.classList.add('hidden');
-          pLogoFallback.classList.remove('hidden');
-        }
+        // Use the same robust loader as header/auth (fixes “loaded on desktop but not on mobile”)
+        setImgWithFallback(pLogoImg, pLogoFallback, logoUrl);
       }
 
       const bankLine = [bankName, bankAccount, bankHolder].filter(Boolean).join(' • ');
@@ -5527,6 +5548,12 @@ service cloud.firestore {
         saveProfileLogoBtn.addEventListener('click', async () => {
           const url = String(document.getElementById('profileLogoUrl')?.value || '').trim();
           if (!url) return toast('URL Logo masih kosong. Upload atau isi URL dulu.');
+
+          // Light validation: non-https often fails on mobile (mixed content / blocked)
+          if (!/^https:\/\//i.test(url)) {
+            toast('Peringatan: gunakan URL https:// agar logo bisa tampil di HP (hindari mixed content).');
+          }
+
           try {
             saveProfileLogoBtn.disabled = true;
             saveProfileLogoBtn.classList.add('opacity-60');
