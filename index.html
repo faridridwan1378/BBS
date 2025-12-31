@@ -42,16 +42,20 @@
   <header class="sticky top-0 z-40 border-b bg-white/80 glass">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex h-16 items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-500 to-lime-400"></div>
-          <div>
-            <div class="text-sm font-semibold leading-4">Varsha</div>
-            <div class="text-xs text-slate-500 leading-4">Fruits and Goods</div>
+        <button id="brandBtn" type="button" class="flex items-center gap-3 text-left select-none" title="Double click untuk Maintain Profile (Admin)">
+          <div class="h-9 w-9 rounded-xl overflow-hidden border border-slate-200 bg-white">
+            <div id="storeLogoFallback" class="h-full w-full bg-gradient-to-br from-emerald-500 to-lime-400"></div>
+            <img id="storeLogoImg" alt="Logo" class="hidden h-full w-full object-cover" />
           </div>
-        </div>
+          <div>
+            <div id="storeNameHeader" class="text-sm font-semibold leading-4">Varsha</div>
+            <div id="storeTaglineHeader" class="text-xs text-slate-500 leading-4">Fruits and Goods</div>
+          </div>
+        </button>
 
         <nav class="hidden md:flex items-center gap-1">
           <button data-route="market" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100">Marketplace</button>
+          <button data-route="customer.shipping" class="route-btn customer-only rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100">Status Pengiriman</button>
           <button data-route="admin.dashboard" class="route-btn admin-only rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100">Admin • Dashboard</button>
         </nav>
 
@@ -91,6 +95,7 @@
       <div id="mobileNav" class="md:hidden hidden pb-3">
         <div class="grid grid-cols-2 gap-2">
           <button data-route="market" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100 border">Marketplace</button>
+          <button data-route="customer.shipping" class="route-btn customer-only rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100 border">Status Pengiriman</button>
           <button data-route="admin.dashboard" class="route-btn admin-only rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100 border">Admin • Dashboard</button>
         </div>
       </div>
@@ -107,11 +112,11 @@
         <div class="relative p-6 sm:p-10">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div class="max-w-2xl text-white">
-              <div class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">Marketplace • Buah Segar Harian</div>
-              <h1 class="mt-4 text-3xl sm:text-4xl font-extrabold leading-tight">Belanja buah segar, cepat, dan hemat di <span class="underline decoration-white/60">Varsha Fruits and Goods</span></h1>
-              <p class="mt-3 text-white/90">Pilih buah lokal, impor, musiman, dan tropis. Promo berjalan otomatis, stok real-time, checkout sederhana.</p>
+              <div id="heroBadge" class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">Marketplace • Buah Segar Harian</div>
+              <h1 id="heroHeadline" class="mt-4 text-3xl sm:text-4xl font-extrabold leading-tight">Belanja buah segar, cepat, dan hemat di <span class="underline decoration-white/60">Varsha Fruits and Goods</span></h1>
+              <p id="heroSubheadline" class="mt-3 text-white/90">Pilih buah lokal, impor, musiman, dan tropis. Promo berjalan otomatis, stok real-time, checkout sederhana.</p>
               <div class="mt-5 flex flex-wrap gap-2">
-                <button class="rounded-xl bg-white text-emerald-700 px-4 py-2 text-sm font-bold hover:bg-white/95" id="scrollToProductsBtn">Lihat Produk</button>
+                <button class="rounded-xl bg-white text-emerald-700 px-4 py-2 text-sm font-bold hover:bg-white/95" id="heroCtaBtn">Lihat Produk</button>
                 <button class="admin-only rounded-xl bg-white/15 text-white px-4 py-2 text-sm font-semibold hover:bg-white/20" data-route="admin.dashboard">Masuk Admin</button>
               </div>
             </div>
@@ -208,9 +213,260 @@
       </div>
     </section>
 
+    <!-- CUSTOMER: STATUS PENGIRIMAN -->
+    <section id="view-customer-shipping" class="view hidden fade-in">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-extrabold">Status Pengiriman</h2>
+          <p class="text-sm text-slate-500">Cek status order kamu (Pending/Diproses/Dikirim/Selesai). Data diambil dari transaksi yang dibuat saat checkout.</p>
+        </div>
+        <div class="text-xs text-slate-500">Tips: Pastikan login memakai email yang sama seperti saat checkout.</div>
+      </div>
+
+      <div id="custShipLoginHint" class="mt-4 hidden rounded-2xl border bg-white p-5">
+        <div class="font-extrabold">Silakan login untuk melihat status pengiriman</div>
+        <div class="mt-1 text-sm text-slate-500">Status pengiriman ditampilkan berdasarkan email akun customer.</div>
+        <div class="mt-1 text-xs text-slate-500">Catatan: order lama (sebelum update) yang belum punya email mungkin tidak muncul.</div>
+        <div class="mt-3">
+          <button id="custShipLoginBtn" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800">Masuk</button>
+        </div>
+      </div>
+
+      <div id="custShipMain" class="mt-4 rounded-2xl border bg-white p-4">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <input id="custShipSearch" class="w-full md:w-96 rounded-xl border px-3 py-2 text-sm" placeholder="Cari ID order..." />
+            <button id="custShipSearchReset" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Reset</button>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-xs text-slate-500">Status</label>
+            <select id="custShipStatusFilter" class="rounded-xl border bg-white px-3 py-2 text-sm">
+              <option value="">Semua</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Diproses</option>
+              <option value="shipped">Dikirim</option>
+              <option value="delivered">Selesai</option>
+              <option value="canceled">Batal</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4 overflow-auto">
+          <table class="min-w-full text-sm">
+            <thead class="text-xs text-slate-500">
+              <tr class="border-b">
+                <th class="py-2 text-left font-semibold">ID</th>
+                <th class="py-2 text-left font-semibold">Tanggal</th>
+                <th class="py-2 text-left font-semibold">Total</th>
+                <th class="py-2 text-left font-semibold">Ongkir</th>
+                <th class="py-2 text-left font-semibold">Tagihan</th>
+                <th class="py-2 text-left font-semibold">Status</th>
+                <th class="py-2 text-left font-semibold">Update</th>
+              </tr>
+            </thead>
+            <tbody id="custShipBody"></tbody>
+          </table>
+        </div>
+
+        <div id="custShipEmpty" class="hidden mt-6 rounded-xl border bg-slate-50 p-6 text-center">
+          <div class="font-semibold">Belum ada order</div>
+          <div class="text-sm text-slate-500 mt-1">Silakan order dari Marketplace untuk melihat status pengiriman.</div>
+        </div>
+      </div>
+    </section>
+
     <!-- ADMIN LAYOUT (Admin Views) -->
     <div id="adminLayout" class="admin-only hidden">
       <div>
+
+    <!-- ADMIN HERO (Maintain Hero Section) -->
+    <section id="view-admin-hero" class="view hidden fade-in">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-extrabold">Maintain Hero Section</h2>
+          <p class="text-sm text-slate-500">Ubah konten banner utama Marketplace (headline, subheadline, badge) tanpa mengubah kode.</p>
+        </div>
+        <div class="flex gap-2">
+          <button id="resetHeroBtn" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50">Reset Hero</button>
+          <button id="saveHeroBtn" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Simpan</button>
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div class="lg:col-span-6 rounded-2xl border bg-white p-4">
+          <div class="text-sm font-semibold">Form Hero</div>
+          <div class="mt-3 space-y-3">
+            <div>
+              <label class="text-xs text-slate-500">Badge (teks kecil)</label>
+              <input id="heroBadgeInput" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="cth: Marketplace • Buah Segar Harian" />
+            </div>
+            <div>
+              <label class="text-xs text-slate-500">Headline</label>
+              <textarea id="heroHeadlineInput" rows="3" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="cth: Belanja buah segar, cepat, dan hemat di Varsha Fruits and Goods"></textarea>
+              <div class="mt-1 text-xs text-slate-500">Tips: gunakan <span class="font-mono">Varsha Fruits and Goods</span> untuk branding.</div>
+            </div>
+            <div>
+              <label class="text-xs text-slate-500">Subheadline</label>
+              <textarea id="heroSubheadlineInput" rows="3" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="cth: Pilih buah lokal, impor, musiman, dan tropis..." ></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs text-slate-500">Label Tombol CTA</label>
+                <input id="heroCtaLabelInput" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="cth: Lihat Produk" />
+              </div>
+              <div>
+                <label class="text-xs text-slate-500">Aksi Tombol CTA</label>
+                <select id="heroCtaActionInput" class="mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm">
+                  <option value="scroll_products">Scroll ke Produk</option>
+                  <option value="open_cart">Buka Keranjang</option>
+                </select>
+              </div>
+            </div>
+            <div class="rounded-xl border bg-slate-50 p-3 text-xs text-slate-600">
+              Perubahan hero akan langsung terlihat di Marketplace dan ikut tersinkron jika Cloud Sync aktif.
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 rounded-2xl border bg-white p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-semibold">Preview</div>
+              <div class="text-xs text-slate-500">Pratinjau ringkas tampilan hero</div>
+            </div>
+            <button id="applyHeroPreviewBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Preview</button>
+          </div>
+
+          <div class="mt-3 rounded-3xl border bg-gradient-to-br from-emerald-600 via-emerald-500 to-lime-400 overflow-hidden">
+            <div class="p-6">
+              <div id="heroPreviewBadge" class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white">Marketplace • Buah Segar Harian</div>
+              <div id="heroPreviewHeadline" class="mt-4 text-2xl sm:text-3xl font-extrabold leading-tight text-white">Belanja buah segar, cepat, dan hemat di Varsha Fruits and Goods</div>
+              <div id="heroPreviewSubheadline" class="mt-2 text-sm text-white/90">Pilih buah lokal, impor, musiman, dan tropis. Promo berjalan otomatis, stok real-time, checkout sederhana.</div>
+              <div class="mt-4">
+                <span id="heroPreviewCta" class="inline-flex rounded-xl bg-white text-emerald-700 px-4 py-2 text-sm font-bold">Lihat Produk</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN PROFILE (Maintain Store Profile) -->
+    <section id="view-admin-profile" class="view hidden fade-in">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-extrabold">Maintain Profile Toko</h2>
+          <p class="text-sm text-slate-500">Ubah logo, nama toko, rekening pembayaran, dan alamat toko. Akses: double click logo (khusus Admin + kode referensi).</p>
+        </div>
+        <div class="flex gap-2">
+          <button id="resetProfileBtn" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50">Reset</button>
+          <button id="saveProfileBtn" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Simpan</button>
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div class="lg:col-span-6 rounded-2xl border bg-white p-4">
+          <div class="text-sm font-semibold">Form Profile</div>
+
+          <div class="mt-3 space-y-3">
+            <div>
+              <label class="text-xs text-slate-500">Nama Toko</label>
+              <input id="profileStoreName" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="cth: Varsha" />
+            </div>
+            <div>
+              <label class="text-xs text-slate-500">Tagline (opsional)</label>
+              <input id="profileTagline" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="cth: Fruits and Goods" />
+            </div>
+
+            <div>
+              <label class="text-xs text-slate-500">Alamat Toko</label>
+              <textarea id="profileAddress" rows="3" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="Alamat lengkap toko..."></textarea>
+            </div>
+
+            <div class="rounded-xl border bg-slate-50 p-3">
+              <div class="text-xs font-bold text-slate-700">Informasi Rekening (untuk pembayaran)</div>
+              <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="text-xs text-slate-500">Bank</label>
+                  <input id="profileBankName" class="mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm" placeholder="cth: BCA" />
+                </div>
+                <div>
+                  <label class="text-xs text-slate-500">No. Rekening</label>
+                  <input id="profileBankAccount" class="mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm font-mono" placeholder="cth: 1234567890" />
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="text-xs text-slate-500">Atas Nama</label>
+                  <input id="profileBankHolder" class="mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm" placeholder="cth: Varsha Fruits" />
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-2xl border p-3">
+              <div class="text-xs font-bold text-slate-700">Logo Toko</div>
+              <div class="mt-2 flex items-start gap-3">
+                <img id="profileLogoPreview" class="h-16 w-16 rounded-xl object-cover border bg-slate-50" alt="Preview" src="https://images.unsplash.com/photo-1541976590-713941681591?auto=format&fit=crop&w=200&q=60" />
+                <div class="flex-1">
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <input id="profileLogoFile" type="file" accept="image/*" class="block w-full text-sm file:mr-3 file:rounded-xl file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-slate-800" />
+                    <button id="uploadProfileLogoBtn" type="button" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50">Upload</button>
+                    <button id="saveProfileLogoBtn" type="button" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Simpan Logo</button>
+                  </div>
+                  <div id="profileUploadProgressWrap" class="hidden mt-2">
+                    <div class="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                      <div id="profileUploadProgressBar" class="h-2 bg-emerald-600" style="width:0%"></div>
+                    </div>
+                    <div id="profileUploadProgressText" class="mt-1 text-xs text-slate-500">0%</div>
+                  </div>
+                  <div class="mt-2 text-xs text-slate-500">Upload disimpan di <b>Firebase Storage</b> pada Shop ID yang sama (butuh Cloud Sync tersambung). Setelah upload, klik <b>Simpan Logo</b> untuk menerapkan di toko. Atau tempel URL logo di bawah lalu klik <b>Simpan Logo</b>.</div>
+                </div>
+              </div>
+              <div class="mt-3">
+                <label class="text-xs text-slate-500">URL Logo (opsional)</label>
+                <input id="profileLogoUrl" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm font-mono" placeholder="https://..." />
+              </div>
+            </div>
+
+            <div class="rounded-xl border bg-amber-50 p-3 text-xs text-amber-900">
+              <div class="font-extrabold">Catatan</div>
+              <div class="mt-1">Perubahan profile akan tampil di header & modal login. Jika Cloud Sync aktif, profile ikut tersinkron antar gadget.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 rounded-2xl border bg-white p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-semibold">Preview</div>
+              <div class="text-xs text-slate-500">Pratinjau tampilan brand di header</div>
+            </div>
+            <button id="applyProfilePreviewBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Preview</button>
+          </div>
+
+          <div class="mt-3 rounded-2xl border bg-slate-50 p-4">
+            <div class="flex items-center gap-3">
+              <div class="h-11 w-11 rounded-2xl overflow-hidden border bg-white">
+                <div id="profilePreviewLogoFallback" class="h-full w-full bg-gradient-to-br from-emerald-500 to-lime-400"></div>
+                <img id="profilePreviewLogoImg" class="hidden h-full w-full object-cover" alt="Logo" />
+              </div>
+              <div>
+                <div id="profilePreviewName" class="text-sm font-extrabold">Varsha</div>
+                <div id="profilePreviewTagline" class="text-xs text-slate-500">Fruits and Goods</div>
+              </div>
+            </div>
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <div class="rounded-xl border bg-white p-3">
+                <div class="text-xs text-slate-500">Rekening</div>
+                <div id="profilePreviewBank" class="mt-1 font-semibold">-</div>
+              </div>
+              <div class="rounded-xl border bg-white p-3">
+                <div class="text-xs text-slate-500">Alamat</div>
+                <div id="profilePreviewAddress" class="mt-1 text-slate-700">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- ADMIN DASHBOARD -->
     <section id="view-admin-dashboard" class="view hidden fade-in">
@@ -1245,9 +1501,15 @@ service cloud.firestore {
     <div class="absolute inset-0 bg-black/40" data-close="authModal"></div>
     <div class="absolute left-1/2 top-1/2 w-[95vw] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white shadow-2xl border fade-in">
       <div class="flex items-center justify-between p-4 border-b">
-        <div>
-          <div class="text-base font-extrabold">Akun</div>
-          <div class="text-xs text-slate-500">Masuk atau daftar. Role menentukan akses menu.</div>
+        <div class="flex items-center gap-3">
+          <div class="h-9 w-9 rounded-xl overflow-hidden border border-slate-200 bg-white">
+            <div id="storeLogoAuthFallback" class="h-full w-full bg-gradient-to-br from-emerald-500 to-lime-400"></div>
+            <img id="storeLogoAuthImg" alt="Logo" class="hidden h-full w-full object-cover" />
+          </div>
+          <div>
+            <div id="storeNameAuth" class="text-sm font-extrabold leading-4">Varsha</div>
+            <div id="storeTaglineAuth" class="text-xs text-slate-500 leading-4">Fruits and Goods</div>
+          </div>
         </div>
         <button class="rounded-lg p-2 hover:bg-slate-100" data-close="authModal" aria-label="Tutup">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -1270,9 +1532,8 @@ service cloud.firestore {
             <label class="text-xs text-slate-500">Password</label>
             <input id="loginPassword" type="password" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="••••••••" required />
           </div>
-          <div class="rounded-xl border bg-amber-50 p-3 text-xs text-amber-900">
-            <div class="font-extrabold">Catatan</div>
-            <div class="mt-1">Ini login sederhana berbasis <b>localStorage</b> (untuk demo). Untuk produksi, gunakan Auth server/Firebase Auth.</div>
+          <div class="rounded-xl border bg-emerald-50 p-3 text-xs text-emerald-900">
+            <div class="font-semibold">Halo! Yuk masuk dan temukan produk favoritmu dengan harga terbaik hari ini</div>
           </div>
           <div class="flex justify-end gap-2 pt-2">
             <button type="button" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50" data-close="authModal">Batal</button>
@@ -1394,11 +1655,12 @@ service cloud.firestore {
   <!-- Admin Footer Nav (fixed bottom, only for ADMIN role) -->
   <footer id="adminFooter" class="admin-only hidden fixed bottom-0 inset-x-0 w-full z-[55] border-t bg-white/90 glass">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2">
-      <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+      <div class="grid grid-cols-4 sm:grid-cols-8 gap-2">
         <button data-route="admin.dashboard" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Dashboard</button>
         <button data-route="admin.products" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Produk</button>
         <button data-route="admin.purchases" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Pembelian</button>
         <button data-route="admin.promos" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Promo</button>
+        <button data-route="admin.hero" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Kelola Hero</button>
         <button data-route="admin.shipping" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Pengiriman</button>
         <button data-route="admin.transactions" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Transaksi</button>
         <button data-route="admin.reports" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Laporan</button>
@@ -1413,6 +1675,7 @@ service cloud.firestore {
       <div class="rounded-2xl border bg-white/95 p-3 flex items-center justify-between gap-3">
         <div class="text-xs text-slate-600">Anda masuk sebagai <span class="font-semibold">Customer</span></div>
         <div class="flex items-center gap-2">
+          <button data-route="customer.shipping" class="route-btn rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50">Status Pengiriman</button>
           <button id="logoutBtnCustomer" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50">Keluar</button>
         </div>
       </div>
@@ -1546,7 +1809,9 @@ service cloud.firestore {
       orderWebhookEnabled: 'varsha_order_webhook_enabled',
       adminWhatsApp: 'varsha_admin_whatsapp',
       users: 'varsha_users',
-      session: 'varsha_session'
+      session: 'varsha_session',
+      hero: 'varsha_hero_settings',
+      profile: 'varsha_store_profile'
     };
 
     function load(key, fallback) {
@@ -1639,6 +1904,8 @@ service cloud.firestore {
       txRange: { from: '', to: '' },
       shipSearch: '',
       shipStatus: '',
+      custShipSearch: '',
+      custShipStatus: '',
       dashboardRange: { from: '', to: '' },
       charts: { line: null, donut: null }
     };
@@ -1764,6 +2031,12 @@ service cloud.firestore {
         el.classList.toggle('hidden', !isA);
       });
 
+      // Customer-only controls
+      document.querySelectorAll('.customer-only').forEach(el => {
+        // customer-only only shown for logged-in non-admin
+        el.classList.toggle('hidden', !isC);
+      });
+
       // Auth buttons
       const openAuthBtn = document.getElementById('openAuthBtn');
       const userNav = document.getElementById('userNav');
@@ -1851,6 +2124,309 @@ service cloud.firestore {
     function setCart(c) { save(LS.cart, c); }
 
     /**********************
+     * Hero settings (Marketplace Hero)
+     **********************/
+    const DEFAULT_HERO = {
+      badge: 'Marketplace • Buah Segar Harian',
+      headlineHtml: 'Belanja buah segar, cepat, dan hemat di <span class="underline decoration-white/60">Varsha Fruits and Goods</span>',
+      subheadline: 'Pilih buah lokal, impor, musiman, dan tropis. Promo berjalan otomatis, stok real-time, checkout sederhana.',
+      ctaLabel: 'Lihat Produk',
+      ctaAction: 'scroll_products'
+    };
+
+    function getHeroSettings() {
+      const s = load(LS.hero, null);
+      if (!s || typeof s !== 'object') return { ...DEFAULT_HERO };
+      return {
+        badge: String(s.badge ?? DEFAULT_HERO.badge),
+        headlineHtml: String(s.headlineHtml ?? DEFAULT_HERO.headlineHtml),
+        subheadline: String(s.subheadline ?? DEFAULT_HERO.subheadline),
+        ctaLabel: String(s.ctaLabel ?? DEFAULT_HERO.ctaLabel),
+        ctaAction: String(s.ctaAction ?? DEFAULT_HERO.ctaAction)
+      };
+    }
+
+    function setHeroSettings(next) {
+      const payload = {
+        badge: String(next?.badge ?? DEFAULT_HERO.badge),
+        headlineHtml: String(next?.headlineHtml ?? DEFAULT_HERO.headlineHtml),
+        subheadline: String(next?.subheadline ?? DEFAULT_HERO.subheadline),
+        ctaLabel: String(next?.ctaLabel ?? DEFAULT_HERO.ctaLabel),
+        ctaAction: String(next?.ctaAction ?? DEFAULT_HERO.ctaAction)
+      };
+      save(LS.hero, payload);
+    }
+
+    function applyHeroToMarketplace() {
+      const hero = getHeroSettings();
+      const badgeEl = document.getElementById('heroBadge');
+      const headlineEl = document.getElementById('heroHeadline');
+      const subEl = document.getElementById('heroSubheadline');
+      const ctaBtn = document.getElementById('heroCtaBtn');
+
+      if (badgeEl) badgeEl.textContent = hero.badge;
+      if (headlineEl) headlineEl.innerHTML = hero.headlineHtml;
+      if (subEl) subEl.textContent = hero.subheadline;
+      if (ctaBtn) ctaBtn.textContent = hero.ctaLabel;
+
+      // bind action (idempotent)
+      if (ctaBtn && !ctaBtn._boundHero) {
+        ctaBtn.addEventListener('click', () => {
+          const h = getHeroSettings();
+          if (h.ctaAction === 'open_cart') {
+            openCart();
+            return;
+          }
+          // default: scroll to products
+          document.getElementById('productsAnchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        ctaBtn._boundHero = true;
+      }
+    }
+
+    function renderAdminHero() {
+      const hero = getHeroSettings();
+
+      const badgeInput = document.getElementById('heroBadgeInput');
+      const headInput = document.getElementById('heroHeadlineInput');
+      const subInput = document.getElementById('heroSubheadlineInput');
+      const ctaLabelInput = document.getElementById('heroCtaLabelInput');
+      const ctaActionInput = document.getElementById('heroCtaActionInput');
+
+      if (badgeInput && !badgeInput.value) badgeInput.value = hero.badge;
+      if (headInput && !headInput.value) headInput.value = hero.headlineHtml;
+      if (subInput && !subInput.value) subInput.value = hero.subheadline;
+      if (ctaLabelInput && !ctaLabelInput.value) ctaLabelInput.value = hero.ctaLabel;
+      if (ctaActionInput) ctaActionInput.value = hero.ctaAction;
+
+      // apply preview from stored values
+      applyHeroPreviewFromInputs();
+    }
+
+    function applyHeroPreviewFromInputs() {
+      const badge = document.getElementById('heroBadgeInput')?.value ?? '';
+      const headlineHtml = document.getElementById('heroHeadlineInput')?.value ?? '';
+      const sub = document.getElementById('heroSubheadlineInput')?.value ?? '';
+      const ctaLabel = document.getElementById('heroCtaLabelInput')?.value ?? '';
+
+      const pb = document.getElementById('heroPreviewBadge');
+      const ph = document.getElementById('heroPreviewHeadline');
+      const ps = document.getElementById('heroPreviewSubheadline');
+      const pc = document.getElementById('heroPreviewCta');
+
+      if (pb) pb.textContent = badge || DEFAULT_HERO.badge;
+      if (ph) ph.innerHTML = (headlineHtml || DEFAULT_HERO.headlineHtml);
+      if (ps) ps.textContent = sub || DEFAULT_HERO.subheadline;
+      if (pc) pc.textContent = ctaLabel || DEFAULT_HERO.ctaLabel;
+    }
+
+    /**********************
+     * Store Profile (Logo, Store Name, Bank, Address)
+     **********************/
+    const DEFAULT_PROFILE = {
+      storeName: 'Varsha',
+      tagline: 'Fruits and Goods',
+      address: '',
+      bankName: '',
+      bankAccount: '',
+      bankHolder: '',
+      logoUrl: ''
+    };
+
+    function getStoreProfile() {
+      const s = load(LS.profile, null);
+      if (!s || typeof s !== 'object') return { ...DEFAULT_PROFILE };
+      return {
+        storeName: String(s.storeName ?? DEFAULT_PROFILE.storeName),
+        tagline: String(s.tagline ?? DEFAULT_PROFILE.tagline),
+        address: String(s.address ?? DEFAULT_PROFILE.address),
+        bankName: String(s.bankName ?? DEFAULT_PROFILE.bankName),
+        bankAccount: String(s.bankAccount ?? DEFAULT_PROFILE.bankAccount),
+        bankHolder: String(s.bankHolder ?? DEFAULT_PROFILE.bankHolder),
+        logoUrl: String(s.logoUrl ?? DEFAULT_PROFILE.logoUrl)
+      };
+    }
+
+    function setStoreProfile(next) {
+      const payload = {
+        storeName: String(next?.storeName ?? DEFAULT_PROFILE.storeName),
+        tagline: String(next?.tagline ?? DEFAULT_PROFILE.tagline),
+        address: String(next?.address ?? DEFAULT_PROFILE.address),
+        bankName: String(next?.bankName ?? DEFAULT_PROFILE.bankName),
+        bankAccount: String(next?.bankAccount ?? DEFAULT_PROFILE.bankAccount),
+        bankHolder: String(next?.bankHolder ?? DEFAULT_PROFILE.bankHolder),
+        logoUrl: String(next?.logoUrl ?? DEFAULT_PROFILE.logoUrl)
+      };
+      save(LS.profile, payload);
+    }
+
+    function applyStoreProfileToUI() {
+      const p = getStoreProfile();
+
+      // Header
+      const nameHeader = document.getElementById('storeNameHeader');
+      const taglineHeader = document.getElementById('storeTaglineHeader');
+      if (nameHeader) nameHeader.textContent = p.storeName || DEFAULT_PROFILE.storeName;
+      if (taglineHeader) taglineHeader.textContent = p.tagline || DEFAULT_PROFILE.tagline;
+
+      const logoImg = document.getElementById('storeLogoImg');
+      const logoFallback = document.getElementById('storeLogoFallback');
+      if (logoImg && logoFallback) {
+        if (p.logoUrl) {
+          logoImg.src = p.logoUrl;
+          logoImg.classList.remove('hidden');
+          logoFallback.classList.add('hidden');
+        } else {
+          logoImg.removeAttribute('src');
+          logoImg.classList.add('hidden');
+          logoFallback.classList.remove('hidden');
+        }
+      }
+
+      // Auth modal
+      const nameAuth = document.getElementById('storeNameAuth');
+      const taglineAuth = document.getElementById('storeTaglineAuth');
+      if (nameAuth) nameAuth.textContent = p.storeName || DEFAULT_PROFILE.storeName;
+      if (taglineAuth) taglineAuth.textContent = p.tagline || DEFAULT_PROFILE.tagline;
+
+      const logoAuthImg = document.getElementById('storeLogoAuthImg');
+      const logoAuthFallback = document.getElementById('storeLogoAuthFallback');
+      if (logoAuthImg && logoAuthFallback) {
+        if (p.logoUrl) {
+          logoAuthImg.src = p.logoUrl;
+          logoAuthImg.classList.remove('hidden');
+          logoAuthFallback.classList.add('hidden');
+        } else {
+          logoAuthImg.removeAttribute('src');
+          logoAuthImg.classList.add('hidden');
+          logoAuthFallback.classList.remove('hidden');
+        }
+      }
+
+      // Title
+      try {
+        document.title = `${p.storeName || 'Varsha'}${p.tagline ? ' • ' + p.tagline : ''}`;
+      } catch {}
+    }
+
+    function updateProfileLogoPreview(url) {
+      const img = document.getElementById('profileLogoPreview');
+      const fallback = 'https://images.unsplash.com/photo-1541976590-713941681591?auto=format&fit=crop&w=200&q=60';
+      if (!img) return;
+      img.src = url || fallback;
+    }
+
+    function applyProfilePreviewFromInputs() {
+      const storeName = document.getElementById('profileStoreName')?.value ?? '';
+      const tagline = document.getElementById('profileTagline')?.value ?? '';
+      const address = document.getElementById('profileAddress')?.value ?? '';
+      const bankName = document.getElementById('profileBankName')?.value ?? '';
+      const bankAccount = document.getElementById('profileBankAccount')?.value ?? '';
+      const bankHolder = document.getElementById('profileBankHolder')?.value ?? '';
+      const logoUrl = document.getElementById('profileLogoUrl')?.value ?? '';
+
+      const pName = document.getElementById('profilePreviewName');
+      const pTagline = document.getElementById('profilePreviewTagline');
+      const pLogoImg = document.getElementById('profilePreviewLogoImg');
+      const pLogoFallback = document.getElementById('profilePreviewLogoFallback');
+      const pBank = document.getElementById('profilePreviewBank');
+      const pAddr = document.getElementById('profilePreviewAddress');
+
+      if (pName) pName.textContent = storeName || DEFAULT_PROFILE.storeName;
+      if (pTagline) pTagline.textContent = tagline || DEFAULT_PROFILE.tagline;
+
+      if (pLogoImg && pLogoFallback) {
+        if (logoUrl) {
+          pLogoImg.src = logoUrl;
+          pLogoImg.classList.remove('hidden');
+          pLogoFallback.classList.add('hidden');
+        } else {
+          pLogoImg.removeAttribute('src');
+          pLogoImg.classList.add('hidden');
+          pLogoFallback.classList.remove('hidden');
+        }
+      }
+
+      const bankLine = [bankName, bankAccount, bankHolder].filter(Boolean).join(' • ');
+      if (pBank) pBank.textContent = bankLine || '-';
+      if (pAddr) pAddr.textContent = address || '-';
+
+      updateProfileLogoPreview(logoUrl);
+    }
+
+    function renderAdminProfile() {
+      const p = getStoreProfile();
+      const storeName = document.getElementById('profileStoreName');
+      const tagline = document.getElementById('profileTagline');
+      const address = document.getElementById('profileAddress');
+      const bankName = document.getElementById('profileBankName');
+      const bankAcc = document.getElementById('profileBankAccount');
+      const bankHolder = document.getElementById('profileBankHolder');
+      const logoUrl = document.getElementById('profileLogoUrl');
+
+      if (storeName && !storeName.value) storeName.value = p.storeName;
+      if (tagline && !tagline.value) tagline.value = p.tagline;
+      if (address && !address.value) address.value = p.address;
+      if (bankName && !bankName.value) bankName.value = p.bankName;
+      if (bankAcc && !bankAcc.value) bankAcc.value = p.bankAccount;
+      if (bankHolder && !bankHolder.value) bankHolder.value = p.bankHolder;
+      if (logoUrl && !logoUrl.value) logoUrl.value = p.logoUrl;
+
+      updateProfileLogoPreview(p.logoUrl);
+      applyProfilePreviewFromInputs();
+    }
+
+    async function uploadStoreLogoToCloud(file) {
+      const enabled = !!load(LS.cloudEnabled, false);
+      const shopId = String(load(LS.cloudShopId, '') || '').trim();
+      if (!enabled || !cloud.connected) throw new Error('Cloud Sync belum tersambung. Buka Cloud: ... lalu Connect.');
+      if (!shopId) throw new Error('Shop ID belum diisi.');
+      if (!file) throw new Error('Pilih file logo dulu.');
+      if (!file.type?.startsWith('image/')) throw new Error('File harus gambar (image/*).');
+
+      if (!cloud.auth?.currentUser) {
+        await cloud.auth.signInAnonymously();
+      }
+      try { await cloud.auth.currentUser.getIdToken(true); } catch {}
+
+      if (!cloud.bucket) {
+        await cloudPickWorkingBucket(shopId, { timeoutMs: 9000 });
+      }
+
+      const deviceId = getOrCreateDeviceId();
+      const ext = guessExtFromFile(file);
+      const filename = `store_logo_${Date.now()}_${deviceId}.${ext}`;
+      const storagePath = `varsha_shops/${shopId}/store_profile/${filename}`;
+
+      const meta = {
+        contentType: file.type || 'image/jpeg',
+        cacheControl: 'public,max-age=31536000'
+      };
+
+      const wrap = document.getElementById('profileUploadProgressWrap');
+      const bar = document.getElementById('profileUploadProgressBar');
+      const txt = document.getElementById('profileUploadProgressText');
+      if (wrap) wrap.classList.remove('hidden');
+      if (bar) bar.style.width = '0%';
+      if (txt) txt.textContent = '0%';
+
+      const ref = cloudStorageRef(storagePath);
+      const task = ref.put(file, meta);
+
+      await awaitPutTask(task, {
+        timeoutMs: 15000,
+        onProgress: (snap) => {
+          const pct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
+          if (bar) bar.style.width = pct + '%';
+          if (txt) txt.textContent = pct + '%';
+        }
+      });
+
+      const url = await task.snapshot.ref.getDownloadURL();
+      return { url, storagePath, bucket: cloud.bucket };
+    }
+
+    /**********************
      * Promo logic
      **********************/
     function isPromoScheduledActive(promo) {
@@ -1876,7 +2452,10 @@ service cloud.firestore {
      **********************/
     const views = {
       market: 'view-market',
+      'customer.shipping': 'view-customer-shipping',
       'admin.dashboard': 'view-admin-dashboard',
+      'admin.profile': 'view-admin-profile',
+      'admin.hero': 'view-admin-hero',
       'admin.products': 'view-admin-products',
       'admin.purchases': 'view-admin-purchases',
       'admin.promos': 'view-admin-promos',
@@ -1890,6 +2469,11 @@ service cloud.firestore {
       if (String(route || '').startsWith('admin.') && !isAdmin()) {
         toast('Akses ditolak. Menu admin khusus admin.');
         route = 'market';
+      }
+
+      // guard: admin doesn't need customer shipping view
+      if (String(route || '') === 'customer.shipping' && isAdmin()) {
+        route = 'admin.dashboard';
       }
 
       state.route = route;
@@ -1918,7 +2502,10 @@ service cloud.firestore {
 
       // render on route
       if (route === 'market') renderMarketplace();
+      if (route === 'customer.shipping') renderCustomerShipping();
       if (route === 'admin.dashboard') renderDashboard();
+      if (route === 'admin.profile') renderAdminProfile();
+      if (route === 'admin.hero') renderAdminHero();
       if (route === 'admin.products') renderAdminProducts();
       if (route === 'admin.purchases') renderPurchases();
       if (route === 'admin.promos') renderPromos();
@@ -2011,6 +2598,9 @@ service cloud.firestore {
     }
 
     function renderMarketplace() {
+      // Apply hero settings (badge/headline/subheadline/cta)
+      try { applyHeroToMarketplace(); } catch {}
+
       const products = getProducts();
       renderPromoMarquee(products);
 
@@ -2210,24 +2800,28 @@ service cloud.firestore {
       const items = cartDetailed();
       if (items.length === 0) return toast('Keranjang masih kosong.');
 
+      const u = currentUser();
+      if (!u) {
+        toast('Silakan login dulu untuk order.');
+        document.getElementById('authModal')?.classList.remove('hidden');
+        return;
+      }
+
       // Auto-connect cloud in background so confirm checkout can push immediately
       // (Works if Firebase config + Shop ID already saved)
       try { cloudEnsureConnected({ silent: true, forceConnect: true }); } catch {}
 
-      // Autofill from logged-in user (if customer)
+      // Autofill from logged-in user
       try {
-        const u = currentUser();
         const nameEl = document.getElementById('buyerName');
         const waEl = document.getElementById('buyerWhatsApp');
-        if (u) {
-          if (nameEl && !nameEl.value) nameEl.value = u.name || '';
-          if (waEl && !waEl.value) waEl.value = u.whatsApp || '';
-        }
+        if (nameEl && !nameEl.value) nameEl.value = u.name || '';
+        if (waEl && !waEl.value) waEl.value = u.whatsApp || '';
       } catch {}
 
       document.getElementById('checkoutModal').classList.remove('hidden');
       // focus to address so customer tinggal isi alamat
-      document.getElementById('buyerAddress').focus();
+      document.getElementById('buyerAddress')?.focus();
     }
 
     function closeModal(id) {
@@ -2298,6 +2892,7 @@ service cloud.firestore {
             id: txIdOverride || uid('TX'),
             date: new Date().toISOString(),
             buyerName: name,
+            buyerEmail: String(currentUser()?.email || '').trim().toLowerCase(),
             buyerWhatsApp: whatsApp || '',
             buyerAddress: address,
             buyerNote: note || '',
@@ -2924,6 +3519,11 @@ service cloud.firestore {
 
     function normalizeTxShipping(tx) {
       if (!tx) return tx;
+      // Normalize optional buyer identity fields (for older data)
+      if (!tx.buyerEmail) tx.buyerEmail = '';
+      if (!tx.buyerWhatsApp) tx.buyerWhatsApp = '';
+      if (!tx.buyerNote) tx.buyerNote = '';
+
       if (!tx.shipping || typeof tx.shipping !== 'object') {
         tx.shipping = { status: 'pending', updatedAt: '', updatedBy: '', fee: 0, billConfirmedAt: '', billConfirmedBy: '' };
       }
@@ -2963,10 +3563,21 @@ service cloud.firestore {
       const bill = totalItems + fee;
       const items = Array.isArray(tx?.items) ? tx.items : [];
 
+      // Payment info from Store Profile
+      let profile = null;
+      try { profile = getStoreProfile(); } catch {}
+      const storeTitle = [profile?.storeName, profile?.tagline].filter(Boolean).join(' ') || 'Varsha Fruits and Goods';
+
+      const payLines = [];
+      if (profile?.bankName) payLines.push(`Bank: ${profile.bankName}`);
+      if (profile?.bankAccount) payLines.push(`No Rek: ${profile.bankAccount}`);
+      if (profile?.bankHolder) payLines.push(`A/N: ${profile.bankHolder}`);
+
       const lines = [];
-      lines.push(`Konfirmasi Tagihan - Varsha Fruits and Goods`);
+      lines.push(`Konfirmasi Tagihan - ${storeTitle}`);
       if (tx?.id) lines.push(`ID: ${tx.id}`);
       if (tx?.buyerName) lines.push(`Nama: ${tx.buyerName}`);
+      if (tx?.buyerEmail) lines.push(`Email: ${tx.buyerEmail}`);
       if (tx?.buyerWhatsApp) lines.push(`WA: ${tx.buyerWhatsApp}`);
       if (tx?.buyerAddress) lines.push(`Alamat: ${tx.buyerAddress}`);
       if (tx?.buyerNote) lines.push(`Catatan: ${tx.buyerNote}`);
@@ -2986,6 +3597,13 @@ service cloud.firestore {
       lines.push(`Subtotal belanja: ${rupiah(totalItems)}`);
       lines.push(`Biaya pengiriman: ${rupiah(fee)}`);
       lines.push(`Total tagihan: ${rupiah(bill)}`);
+
+      if (payLines.length) {
+        lines.push('');
+        lines.push('Informasi Pembayaran:');
+        payLines.forEach(l => lines.push(l));
+      }
+
       lines.push('');
       lines.push('Silakan lakukan pembayaran sesuai total tagihan di atas. Terima kasih.');
       return lines.join('\n');
@@ -3042,6 +3660,7 @@ service cloud.firestore {
           const hay = [
             tx.id,
             tx.buyerName,
+            tx.buyerEmail,
             tx.buyerWhatsApp,
             tx.buyerAddress,
             tx.buyerNote
@@ -3172,6 +3791,7 @@ service cloud.firestore {
           tx_id: tx.id,
           tx_date: new Date(tx.date).toLocaleString('id-ID'),
           buyer_name: tx.buyerName || '',
+          buyer_email: tx.buyerEmail || '',
           buyer_whatsapp: tx.buyerWhatsApp || '',
           buyer_address: tx.buyerAddress || '',
           total_items: tx.total || 0,
@@ -3186,6 +3806,78 @@ service cloud.firestore {
       });
       const csv = toCSV(rows.length ? rows : [{ note: 'Tidak ada data pengiriman.' }]);
       downloadText(`Varsha_Laporan_Pengiriman_${toISODate(new Date())}.csv`, csv);
+    }
+
+    /**********************
+     * Customer: Shipping Status
+     **********************/
+    function renderCustomerShipping() {
+      const u = currentUser();
+      const loginHint = document.getElementById('custShipLoginHint');
+      const main = document.getElementById('custShipMain');
+      const body = document.getElementById('custShipBody');
+      const empty = document.getElementById('custShipEmpty');
+
+      if (!loginHint || !main || !body || !empty) return;
+
+      if (!u) {
+        loginHint.classList.remove('hidden');
+        main.classList.add('hidden');
+        return;
+      }
+
+      loginHint.classList.add('hidden');
+      main.classList.remove('hidden');
+
+      const userEmail = String(u.email || '').trim().toLowerCase();
+      if (!userEmail) {
+        body.innerHTML = '';
+        empty.classList.remove('hidden');
+        empty.innerHTML = `
+          <div class="font-semibold">Email akun belum tersedia</div>
+          <div class="text-sm text-slate-500 mt-1">Status pengiriman ditampilkan berdasarkan email akun. Silakan login ulang.</div>
+        `;
+        return;
+      }
+
+      const q = String(state.custShipSearch || '').trim().toLowerCase();
+      const st = String(state.custShipStatus || '').trim();
+
+      let list = getTransactions().slice();
+      list.forEach(normalizeTxShipping);
+      list = list.filter(tx => String(tx.buyerEmail || '').trim().toLowerCase() === userEmail);
+      if (st) list = list.filter(tx => (tx.shipping?.status || 'pending') === st);
+      if (q) list = list.filter(tx => String(tx.id || '').toLowerCase().includes(q));
+
+      body.innerHTML = '';
+      empty.classList.toggle('hidden', list.length !== 0);
+
+      if (list.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="py-6 text-center text-slate-500" colspan="7">Tidak ada order yang cocok.</td>`;
+        body.appendChild(tr);
+        return;
+      }
+
+      for (const tx of list) {
+        const meta = getShippingMeta(tx.shipping?.status);
+        const fee = Number(tx.shipping?.fee || 0);
+        const bill = getTxBillTotal(tx);
+        const upd = tx.shipping?.updatedAt ? new Date(tx.shipping.updatedAt).toLocaleString('id-ID') : '-';
+
+        const tr = document.createElement('tr');
+        tr.className = 'border-b last:border-b-0 align-top';
+        tr.innerHTML = `
+          <td class="py-3 font-semibold whitespace-nowrap">${tx.id}</td>
+          <td class="py-3 whitespace-nowrap">${new Date(tx.date).toLocaleString('id-ID')}</td>
+          <td class="py-3 whitespace-nowrap">${rupiah(tx.total || 0)}</td>
+          <td class="py-3 whitespace-nowrap">${rupiah(fee)}</td>
+          <td class="py-3 whitespace-nowrap font-extrabold">${rupiah(bill)}</td>
+          <td class="py-3"><span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-bold ${meta.cls}">${meta.label}</span></td>
+          <td class="py-3 text-xs text-slate-500">${upd}</td>
+        `;
+        body.appendChild(tr);
+      }
     }
 
     /**********************
@@ -3220,6 +3912,7 @@ service cloud.firestore {
           <td class="py-3">${new Date(tx.date).toLocaleString('id-ID')}</td>
           <td class="py-3">
             <div class="font-semibold">${tx.buyerName || '-'}</div>
+            ${tx.buyerEmail ? `<div class="text-xs text-slate-600">${tx.buyerEmail}</div>` : ''}
             ${tx.buyerWhatsApp ? `<div class="text-xs text-slate-600 font-mono">${tx.buyerWhatsApp}</div>` : ''}
             <div class="text-xs text-slate-500 truncate max-w-[360px]">${tx.buyerAddress || ''}</div>
             ${tx.buyerNote ? `<div class="mt-1 text-xs text-slate-500 italic truncate max-w-[360px]">Catatan: ${tx.buyerNote}</div>` : ''}
@@ -3257,6 +3950,7 @@ service cloud.firestore {
             tx_id: tx.id,
             tx_date: new Date(tx.date).toLocaleString('id-ID'),
             buyer_name: tx.buyerName,
+            buyer_email: tx.buyerEmail || '',
             buyer_whatsapp: tx.buyerWhatsApp || '',
             buyer_address: tx.buyerAddress,
             buyer_note: tx.buyerNote || '',
@@ -3845,7 +4539,9 @@ service cloud.firestore {
         products: getProducts(),
         transactions: getTransactions(),
         purchases: getPurchases(),
-        cart: getCart()
+        cart: getCart(),
+        hero: load(LS.hero, DEFAULT_HERO),
+        profile: load(LS.profile, DEFAULT_PROFILE)
       };
     }
 
@@ -3855,6 +4551,13 @@ service cloud.firestore {
       save(LS.transactions, Array.isArray(data.transactions) ? data.transactions : []);
       save(LS.purchases, Array.isArray(data.purchases) ? data.purchases : []);
       save(LS.cart, Array.isArray(data.cart) ? data.cart : []);
+      // Optional settings synced via Cloud
+      if (data.hero && typeof data.hero === 'object') save(LS.hero, data.hero);
+      if (data.profile && typeof data.profile === 'object') save(LS.profile, data.profile);
+
+      // Apply to UI (header, auth modal, etc)
+      try { applyStoreProfileToUI(); } catch {}
+      try { applyHeroToMarketplace(); } catch {}
     }
 
     function getLastSeenTxId() {
@@ -4297,6 +5000,7 @@ service cloud.firestore {
       if (state.route === 'admin.promos') renderPromos();
       if (state.route === 'admin.shipping') renderShipping();
       if (state.route === 'admin.transactions') renderTransactions();
+      if (state.route === 'customer.shipping') renderCustomerShipping();
     }
 
     /**********************
@@ -4337,9 +5041,8 @@ service cloud.firestore {
         document.getElementById('searchInput').value = '';
         renderMarketplace();
       });
-      document.getElementById('scrollToProductsBtn').addEventListener('click', () => {
-        document.getElementById('productsAnchor').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+      // Hero CTA handled by applyHeroToMarketplace() so it can be configurable
+      // (no direct binding here)
 
       // Cloud Sync modal open
       const cloudNavStatusBtn = document.getElementById('cloudNavStatus');
@@ -4377,6 +5080,32 @@ service cloud.firestore {
       if (openCloudSyncBtnReports && !openCloudSyncBtnReports._boundOpen) {
         openCloudSyncBtnReports.addEventListener('click', openCloudSyncModal);
         openCloudSyncBtnReports._boundOpen = true;
+      }
+
+      // Hidden access: double click logo -> Maintain Profile (Admin + kode referensi)
+      const brandBtn = document.getElementById('brandBtn');
+      if (brandBtn && !brandBtn._boundDbl) {
+        brandBtn.addEventListener('dblclick', async () => {
+          if (!isAdmin()) {
+            toast('Akses ditolak. Khusus Admin.');
+            return;
+          }
+          const code = prompt('Masukkan Kode Referensi Admin untuk akses Maintain Profile:');
+          if (code === null) return;
+          try {
+            // must match admin reference hash (same as in authRegister)
+            const ADMIN_REF_HASH = 'e12d51b1';
+            if (simpleHash(String(code).trim()) !== ADMIN_REF_HASH) {
+              toast('Kode referensi tidak valid.');
+              return;
+            }
+            routeTo('admin.profile');
+          } catch (e) {
+            console.warn(e);
+            toast('Gagal membuka Maintain Profile.');
+          }
+        });
+        brandBtn._boundDbl = true;
       }
 
       // Auth
@@ -4638,6 +5367,204 @@ service cloud.firestore {
         upsertProduct(data);
       });
 
+      // Maintain Profile (Store)
+      const applyProfilePreviewBtn = document.getElementById('applyProfilePreviewBtn');
+      const saveProfileBtn = document.getElementById('saveProfileBtn');
+      const resetProfileBtn = document.getElementById('resetProfileBtn');
+      const uploadProfileLogoBtn = document.getElementById('uploadProfileLogoBtn');
+      const saveProfileLogoBtn = document.getElementById('saveProfileLogoBtn');
+      const profileLogoUrlEl = document.getElementById('profileLogoUrl');
+
+      if (applyProfilePreviewBtn && !applyProfilePreviewBtn._bound) {
+        applyProfilePreviewBtn.addEventListener('click', applyProfilePreviewFromInputs);
+        applyProfilePreviewBtn._bound = true;
+      }
+      if (profileLogoUrlEl && !profileLogoUrlEl._boundPreview) {
+        profileLogoUrlEl.addEventListener('input', () => applyProfilePreviewFromInputs());
+        profileLogoUrlEl._boundPreview = true;
+      }
+
+      if (uploadProfileLogoBtn && !uploadProfileLogoBtn._bound) {
+        uploadProfileLogoBtn.addEventListener('click', async () => {
+          const fileEl = document.getElementById('profileLogoFile');
+          const urlEl = document.getElementById('profileLogoUrl');
+          const file = fileEl?.files?.[0];
+          try {
+            uploadProfileLogoBtn.disabled = true;
+            uploadProfileLogoBtn.classList.add('opacity-60');
+            uploadProfileLogoBtn.textContent = 'Uploading...';
+            const { url } = await uploadStoreLogoToCloud(file);
+            if (urlEl) urlEl.value = url;
+            applyProfilePreviewFromInputs();
+            toast('Upload logo berhasil. Klik Simpan untuk menerapkan.');
+          } catch (e) {
+            console.warn(e);
+            toast(e?.message || 'Gagal upload logo.');
+            showCloudError(e);
+          } finally {
+            uploadProfileLogoBtn.disabled = false;
+            uploadProfileLogoBtn.classList.remove('opacity-60');
+            uploadProfileLogoBtn.textContent = 'Upload';
+          }
+        });
+        uploadProfileLogoBtn._bound = true;
+      }
+
+      if (saveProfileLogoBtn && !saveProfileLogoBtn._bound) {
+        saveProfileLogoBtn.addEventListener('click', async () => {
+          const url = String(document.getElementById('profileLogoUrl')?.value || '').trim();
+          if (!url) return toast('URL Logo masih kosong. Upload atau isi URL dulu.');
+          try {
+            saveProfileLogoBtn.disabled = true;
+            saveProfileLogoBtn.classList.add('opacity-60');
+            saveProfileLogoBtn.textContent = 'Menyimpan...';
+
+            await cloudSyncWrite(() => {
+              const p = getStoreProfile();
+              p.logoUrl = url;
+              setStoreProfile(p);
+            }, { reason: 'saveProfileLogo' });
+
+            applyStoreProfileToUI();
+            applyProfilePreviewFromInputs();
+            toast('Logo tersimpan.');
+          } catch (e) {
+            console.warn(e);
+            toast(e?.message || 'Gagal simpan logo.');
+          } finally {
+            saveProfileLogoBtn.disabled = false;
+            saveProfileLogoBtn.classList.remove('opacity-60');
+            saveProfileLogoBtn.textContent = 'Simpan Logo';
+          }
+        });
+        saveProfileLogoBtn._bound = true;
+      }
+
+      if (saveProfileBtn && !saveProfileBtn._bound) {
+        saveProfileBtn.addEventListener('click', async () => {
+          const payload = {
+            storeName: String(document.getElementById('profileStoreName')?.value || '').trim(),
+            tagline: String(document.getElementById('profileTagline')?.value || '').trim(),
+            address: String(document.getElementById('profileAddress')?.value || '').trim(),
+            bankName: String(document.getElementById('profileBankName')?.value || '').trim(),
+            bankAccount: String(document.getElementById('profileBankAccount')?.value || '').trim(),
+            bankHolder: String(document.getElementById('profileBankHolder')?.value || '').trim(),
+            logoUrl: String(document.getElementById('profileLogoUrl')?.value || '').trim()
+          };
+
+          try {
+            saveProfileBtn.disabled = true;
+            saveProfileBtn.classList.add('opacity-60');
+            saveProfileBtn.textContent = 'Menyimpan...';
+
+            await cloudSyncWrite(() => {
+              setStoreProfile(payload);
+            }, { reason: 'saveProfile' });
+
+            applyStoreProfileToUI();
+            toast('Profile toko disimpan.');
+          } catch (e) {
+            console.warn(e);
+            toast(e?.message || 'Gagal simpan profile.');
+          } finally {
+            saveProfileBtn.disabled = false;
+            saveProfileBtn.classList.remove('opacity-60');
+            saveProfileBtn.textContent = 'Simpan';
+          }
+        });
+        saveProfileBtn._bound = true;
+      }
+
+      if (resetProfileBtn && !resetProfileBtn._bound) {
+        resetProfileBtn.addEventListener('click', async () => {
+          if (!confirm('Reset profile toko ke default?')) return;
+          try {
+            await cloudSyncWrite(() => {
+              setStoreProfile(DEFAULT_PROFILE);
+            }, { reason: 'resetProfile' });
+            // clear inputs so renderAdminProfile can re-fill
+            ['profileStoreName','profileTagline','profileAddress','profileBankName','profileBankAccount','profileBankHolder','profileLogoUrl'].forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.value = '';
+            });
+            applyStoreProfileToUI();
+            renderAdminProfile();
+            toast('Profile direset.');
+          } catch (e) {
+            console.warn(e);
+            toast(e?.message || 'Gagal reset profile.');
+          }
+        });
+        resetProfileBtn._bound = true;
+      }
+
+      // Maintain Hero
+      const applyHeroPreviewBtn = document.getElementById('applyHeroPreviewBtn');
+      const saveHeroBtn = document.getElementById('saveHeroBtn');
+      const resetHeroBtn = document.getElementById('resetHeroBtn');
+
+      if (applyHeroPreviewBtn && !applyHeroPreviewBtn._bound) {
+        applyHeroPreviewBtn.addEventListener('click', applyHeroPreviewFromInputs);
+        applyHeroPreviewBtn._bound = true;
+      }
+
+      if (saveHeroBtn && !saveHeroBtn._bound) {
+        saveHeroBtn.addEventListener('click', async () => {
+          const next = {
+            badge: document.getElementById('heroBadgeInput')?.value || DEFAULT_HERO.badge,
+            headlineHtml: document.getElementById('heroHeadlineInput')?.value || DEFAULT_HERO.headlineHtml,
+            subheadline: document.getElementById('heroSubheadlineInput')?.value || DEFAULT_HERO.subheadline,
+            ctaLabel: document.getElementById('heroCtaLabelInput')?.value || DEFAULT_HERO.ctaLabel,
+            ctaAction: document.getElementById('heroCtaActionInput')?.value || DEFAULT_HERO.ctaAction
+          };
+          try {
+            saveHeroBtn.disabled = true;
+            saveHeroBtn.classList.add('opacity-60');
+            saveHeroBtn.textContent = 'Menyimpan...';
+
+            await cloudSyncWrite(() => {
+              setHeroSettings(next);
+            }, { reason: 'saveHero' });
+
+            applyHeroToMarketplace();
+            toast('Hero disimpan.');
+          } catch (e) {
+            console.warn(e);
+            toast(e?.message || 'Gagal simpan hero.');
+          } finally {
+            saveHeroBtn.disabled = false;
+            saveHeroBtn.classList.remove('opacity-60');
+            saveHeroBtn.textContent = 'Simpan';
+          }
+        });
+        saveHeroBtn._bound = true;
+      }
+
+      if (resetHeroBtn && !resetHeroBtn._bound) {
+        resetHeroBtn.addEventListener('click', async () => {
+          if (!confirm('Reset hero ke default?')) return;
+          try {
+            await cloudSyncWrite(() => {
+              setHeroSettings(DEFAULT_HERO);
+            }, { reason: 'resetHero' });
+            // clear inputs so renderAdminHero re-fill
+            ['heroBadgeInput','heroHeadlineInput','heroSubheadlineInput','heroCtaLabelInput'].forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.value = '';
+            });
+            const act = document.getElementById('heroCtaActionInput');
+            if (act) act.value = DEFAULT_HERO.ctaAction;
+            renderAdminHero();
+            applyHeroToMarketplace();
+            toast('Hero direset.');
+          } catch (e) {
+            console.warn(e);
+            toast(e?.message || 'Gagal reset hero.');
+          }
+        });
+        resetHeroBtn._bound = true;
+      }
+
       // Admin products filters
       document.getElementById('adminProductSearch').addEventListener('input', (e) => {
         state.adminProductSearch = e.target.value;
@@ -4697,7 +5624,7 @@ service cloud.firestore {
       });
       document.getElementById('refreshPromoBtn').addEventListener('click', renderPromos);
 
-      // Dashboard filters
+      // Dashboard period select
       document.getElementById('periodSelect').addEventListener('change', (e) => {
         const v = e.target.value;
         if (v !== 'custom') {
@@ -4706,6 +5633,7 @@ service cloud.firestore {
           document.getElementById('dateTo').value = r.to;
         }
       });
+
       document.getElementById('applyPeriodBtn').addEventListener('click', () => {
         const period = document.getElementById('periodSelect').value;
         let r;
@@ -4746,6 +5674,39 @@ service cloud.firestore {
       }
       if (exportShippingCsvEl) {
         exportShippingCsvEl.addEventListener('click', exportShippingReport);
+      }
+
+      // Customer shipping status filters
+      const custShipLoginBtn = document.getElementById('custShipLoginBtn');
+      if (custShipLoginBtn && !custShipLoginBtn._bound) {
+        custShipLoginBtn.addEventListener('click', () => {
+          document.getElementById('authModal')?.classList.remove('hidden');
+        });
+        custShipLoginBtn._bound = true;
+      }
+
+      const custShipSearchEl = document.getElementById('custShipSearch');
+      const custShipResetEl = document.getElementById('custShipSearchReset');
+      const custShipStatusEl = document.getElementById('custShipStatusFilter');
+
+      if (custShipSearchEl) {
+        custShipSearchEl.addEventListener('input', (e) => {
+          state.custShipSearch = e.target.value;
+          renderCustomerShipping();
+        });
+      }
+      if (custShipResetEl) {
+        custShipResetEl.addEventListener('click', () => {
+          state.custShipSearch = '';
+          if (custShipSearchEl) custShipSearchEl.value = '';
+          renderCustomerShipping();
+        });
+      }
+      if (custShipStatusEl) {
+        custShipStatusEl.addEventListener('change', (e) => {
+          state.custShipStatus = e.target.value;
+          renderCustomerShipping();
+        });
       }
 
       // Transactions filters
@@ -5013,6 +5974,8 @@ service cloud.firestore {
     ensureDefaultAccounts();
     bindEvents();
     applyRoleUI();
+    // Apply store profile (logo/name) early
+    try { applyStoreProfileToUI(); } catch {}
 
     // Ensure Firebase config default is always set (without overriding existing settings)
     ensureCloudDefaults({ enable: false });
@@ -5026,6 +5989,7 @@ service cloud.firestore {
     // initial renders
     fillProductSelects();
     renderCart();
+    renderCustomerShipping();
     routeTo('market');
 
     // update header indicator from saved setting
