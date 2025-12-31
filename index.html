@@ -45,7 +45,7 @@
         <button id="brandBtn" type="button" class="flex items-center gap-3 text-left select-none" title="Varsha Fruits and Goods">
           <div class="h-[120px] w-[120px] rounded-3xl overflow-hidden border border-slate-200 bg-white">
             <div id="storeLogoFallback" class="h-full w-full bg-gradient-to-br from-emerald-500 to-lime-400"></div>
-            <img id="storeLogoImg" alt="Logo" class="hidden h-full w-full object-cover" referrerpolicy="no-referrer" decoding="async" loading="eager" />
+            <img id="storeLogoImg" alt="Logo" class="hidden h-full w-full object-cover" referrerpolicy="no-referrer" decoding="async" loading="eager" fetchpriority="high" />
           </div>
           <div>
             <div id="storeNameHeader" class="text-[28px] font-semibold leading-[1.1]">Varsha</div>
@@ -104,7 +104,7 @@
     <!-- MARKETPLACE -->
     <section id="view-market" class="view fade-in">
       <!-- Hero -->
-      <div class="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-emerald-600 via-emerald-500 to-lime-400">
+      <div id="heroWrap" class="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-emerald-600 via-emerald-500 to-lime-400">
         <div class="absolute inset-0 opacity-25" style="background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,.6), transparent 45%), radial-gradient(circle at 80% 30%, rgba(255,255,255,.45), transparent 55%), radial-gradient(circle at 50% 90%, rgba(255,255,255,.35), transparent 50%);"></div>
         <div class="relative p-6 sm:p-10">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
@@ -308,6 +308,24 @@
             </div>
 
             <div class="rounded-xl border bg-slate-50 p-3">
+              <div class="text-xs font-extrabold text-slate-700">Background Hero (opsional)</div>
+              <div class="mt-2 space-y-2">
+                <div>
+                  <label class="text-xs text-slate-500">URL Gambar Background</label>
+                  <input id="heroBgImageUrlInput" class="mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm font-mono" placeholder="https://..." />
+                  <div class="mt-1 text-xs text-slate-500">Kosongkan untuk memakai background gradient default.</div>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between">
+                    <label class="text-xs text-slate-500">Overlay gelap (agar teks terbaca)</label>
+                    <div id="heroBgOverlayLabel" class="text-xs font-semibold text-slate-600">35%</div>
+                  </div>
+                  <input id="heroBgOverlayInput" type="range" min="0" max="85" value="35" class="mt-2 w-full accent-emerald-600" />
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-xl border bg-slate-50 p-3">
               <div class="text-xs font-extrabold text-slate-700">Panel Keunggulan (kanan)</div>
               <div class="mt-2 space-y-2">
                 <div>
@@ -353,7 +371,7 @@
             <button id="applyHeroPreviewBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Preview</button>
           </div>
 
-          <div class="mt-3 rounded-3xl border bg-gradient-to-br from-emerald-600 via-emerald-500 to-lime-400 overflow-hidden">
+          <div id="heroPreviewWrap" class="mt-3 rounded-3xl border bg-gradient-to-br from-emerald-600 via-emerald-500 to-lime-400 overflow-hidden">
             <div class="p-6">
               <div id="heroPreviewBadge" class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white">Marketplace • Buah Segar Harian</div>
               <div id="heroPreviewHeadline" class="mt-4 text-2xl sm:text-3xl font-extrabold leading-tight text-white">Belanja buah segar, cepat, dan hemat di Varsha Fruits and Goods</div>
@@ -470,7 +488,7 @@
             <div class="flex items-center gap-3">
               <div class="h-[120px] w-[120px] rounded-3xl overflow-hidden border bg-white">
                 <div id="profilePreviewLogoFallback" class="h-full w-full bg-gradient-to-br from-emerald-500 to-lime-400"></div>
-                <img id="profilePreviewLogoImg" class="hidden h-full w-full object-cover" alt="Logo" referrerpolicy="no-referrer" decoding="async" loading="eager" />
+                <img id="profilePreviewLogoImg" class="hidden h-full w-full object-cover" alt="Logo" referrerpolicy="no-referrer" decoding="async" loading="eager" fetchpriority="high" />
               </div>
               <div>
                 <div id="profilePreviewName" class="text-[28px] font-extrabold leading-[1.1]">Varsha</div>
@@ -1539,7 +1557,7 @@ service cloud.firestore {
         <div class="flex items-center gap-3">
           <div class="h-[120px] w-[120px] rounded-3xl overflow-hidden border border-slate-200 bg-white">
             <div id="storeLogoAuthFallback" class="h-full w-full bg-gradient-to-br from-emerald-500 to-lime-400"></div>
-            <img id="storeLogoAuthImg" alt="Logo" class="hidden h-full w-full object-cover" referrerpolicy="no-referrer" decoding="async" loading="eager" />
+            <img id="storeLogoAuthImg" alt="Logo" class="hidden h-full w-full object-cover" referrerpolicy="no-referrer" decoding="async" loading="eager" fetchpriority="high" />
           </div>
           <div>
             <div id="storeNameAuth" class="text-[28px] font-extrabold leading-[1.1]">Varsha</div>
@@ -2180,6 +2198,12 @@ service cloud.firestore {
       subheadline: 'Pilih buah lokal, impor, musiman, dan tropis. Promo berjalan otomatis, stok real-time, checkout sederhana.',
       ctaLabel: 'Lihat Produk',
       ctaAction: 'scroll_products',
+
+      // Optional hero background image
+      bgImageUrl: '',
+      // 0..85 (percent) - darkness overlay so text stays readable on image
+      bgOverlay: 35,
+
       perksTitle: 'Keunggulan',
       perksSubtitle: 'Harga transparan & profit tercatat',
       perksBullets: [
@@ -2206,6 +2230,10 @@ service cloud.firestore {
         subheadline: String(s.subheadline ?? DEFAULT_HERO.subheadline),
         ctaLabel: String(s.ctaLabel ?? DEFAULT_HERO.ctaLabel),
         ctaAction: String(s.ctaAction ?? DEFAULT_HERO.ctaAction),
+
+        bgImageUrl: String(s.bgImageUrl ?? DEFAULT_HERO.bgImageUrl),
+        bgOverlay: clamp(Number(s.bgOverlay ?? DEFAULT_HERO.bgOverlay), 0, 85),
+
         perksTitle: String(s.perksTitle ?? DEFAULT_HERO.perksTitle),
         perksSubtitle: String(s.perksSubtitle ?? DEFAULT_HERO.perksSubtitle),
         perksBullets: normalizeBullets(s.perksBullets ?? DEFAULT_HERO.perksBullets)
@@ -2219,6 +2247,10 @@ service cloud.firestore {
         subheadline: String(next?.subheadline ?? DEFAULT_HERO.subheadline),
         ctaLabel: String(next?.ctaLabel ?? DEFAULT_HERO.ctaLabel),
         ctaAction: String(next?.ctaAction ?? DEFAULT_HERO.ctaAction),
+
+        bgImageUrl: String(next?.bgImageUrl ?? DEFAULT_HERO.bgImageUrl),
+        bgOverlay: clamp(Number(next?.bgOverlay ?? DEFAULT_HERO.bgOverlay), 0, 85),
+
         perksTitle: String(next?.perksTitle ?? DEFAULT_HERO.perksTitle),
         perksSubtitle: String(next?.perksSubtitle ?? DEFAULT_HERO.perksSubtitle),
         perksBullets: normalizeBullets(next?.perksBullets ?? DEFAULT_HERO.perksBullets)
@@ -2234,12 +2266,38 @@ service cloud.firestore {
       return String(headlineHtml || '').replaceAll('{{brand}}', brandHtml);
     }
 
+    function setHeroBackground(el, hero) {
+      if (!el) return;
+      const url = String(hero?.bgImageUrl || '').trim();
+      const overlay = clamp(Number(hero?.bgOverlay ?? 35), 0, 85);
+
+      // reset to default gradient if no image
+      if (!url) {
+        el.style.removeProperty('background-image');
+        el.style.removeProperty('background-size');
+        el.style.removeProperty('background-position');
+        el.style.removeProperty('background-repeat');
+        return;
+      }
+
+      // Combine overlay + image (keep overall style)
+      // Note: we keep the original gradient classes as fallback.
+      el.style.backgroundImage = `linear-gradient(rgba(0,0,0,${overlay/100}), rgba(0,0,0,${overlay/100})), url('${url.replaceAll("'", "\\'")}')`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+      el.style.backgroundRepeat = 'no-repeat';
+    }
+
     function applyHeroToMarketplace() {
       const hero = getHeroSettings();
+      const wrap = document.getElementById('heroWrap');
       const badgeEl = document.getElementById('heroBadge');
       const headlineEl = document.getElementById('heroHeadline');
       const subEl = document.getElementById('heroSubheadline');
       const ctaBtn = document.getElementById('heroCtaBtn');
+
+      // Apply background image (optional)
+      setHeroBackground(wrap, hero);
 
       // Perks panel (right)
       const perksTitleEl = document.getElementById('heroPerksTitle');
@@ -2288,12 +2346,19 @@ service cloud.firestore {
       const perksTitleInput = document.getElementById('heroPerksTitleInput');
       const perksSubtitleInput = document.getElementById('heroPerksSubtitleInput');
       const perksBulletsInput = document.getElementById('heroPerksBulletsInput');
+      const bgUrlInput = document.getElementById('heroBgImageUrlInput');
+      const bgOverlayInput = document.getElementById('heroBgOverlayInput');
+      const bgOverlayLabel = document.getElementById('heroBgOverlayLabel');
 
       if (badgeInput && !badgeInput.value) badgeInput.value = hero.badge;
       if (headInput && !headInput.value) headInput.value = hero.headlineHtml;
       if (subInput && !subInput.value) subInput.value = hero.subheadline;
       if (ctaLabelInput && !ctaLabelInput.value) ctaLabelInput.value = hero.ctaLabel;
       if (ctaActionInput) ctaActionInput.value = hero.ctaAction;
+
+      if (bgUrlInput && !bgUrlInput.value) bgUrlInput.value = hero.bgImageUrl || '';
+      if (bgOverlayInput) bgOverlayInput.value = String(clamp(Number(hero.bgOverlay ?? 35), 0, 85));
+      if (bgOverlayLabel) bgOverlayLabel.textContent = `${bgOverlayInput?.value || hero.bgOverlay || 35}%`;
 
       if (perksTitleInput && !perksTitleInput.value) perksTitleInput.value = hero.perksTitle || DEFAULT_HERO.perksTitle;
       if (perksSubtitleInput && !perksSubtitleInput.value) perksSubtitleInput.value = hero.perksSubtitle || DEFAULT_HERO.perksSubtitle;
@@ -2309,6 +2374,11 @@ service cloud.firestore {
       const sub = document.getElementById('heroSubheadlineInput')?.value ?? '';
       const ctaLabel = document.getElementById('heroCtaLabelInput')?.value ?? '';
 
+      const bgUrl = document.getElementById('heroBgImageUrlInput')?.value ?? '';
+      const bgOverlay = Number(document.getElementById('heroBgOverlayInput')?.value ?? DEFAULT_HERO.bgOverlay);
+      const bgOverlayLabel = document.getElementById('heroBgOverlayLabel');
+      if (bgOverlayLabel) bgOverlayLabel.textContent = `${clamp(bgOverlay, 0, 85)}%`;
+
       const perksTitle = document.getElementById('heroPerksTitleInput')?.value ?? '';
       const perksSubtitle = document.getElementById('heroPerksSubtitleInput')?.value ?? '';
       const perksBulletsRaw = document.getElementById('heroPerksBulletsInput')?.value ?? '';
@@ -2322,6 +2392,10 @@ service cloud.firestore {
       const ppt = document.getElementById('heroPreviewPerksTitle');
       const pps = document.getElementById('heroPreviewPerksSubtitle');
       const ppl = document.getElementById('heroPreviewPerksList');
+
+      // Apply background to preview wrap
+      const wrap = document.getElementById('heroPreviewWrap');
+      setHeroBackground(wrap, { bgImageUrl: bgUrl, bgOverlay });
 
       if (pb) pb.textContent = badge || DEFAULT_HERO.badge;
       if (ph) ph.innerHTML = renderHeroTemplate(headlineHtml || DEFAULT_HERO.headlineHtml);
@@ -2400,32 +2474,43 @@ service cloud.firestore {
       }
 
       const prev = String(imgEl.getAttribute('src') || '').trim();
-      const isVisible = !imgEl.classList.contains('hidden');
 
-      // If already displaying the same image successfully, do nothing (avoid flicker)
-      if (prev === u && isVisible && !imgEl.classList.contains('opacity-0')) {
+      // If image is already cached/loaded with the same URL, show it immediately.
+      // This fixes cases on mobile where onload doesn't fire (cached image) and the logo stays opacity-0.
+      if (prev === u && imgEl.complete && imgEl.naturalWidth > 0) {
         fallbackEl.classList.add('hidden');
+        imgEl.classList.remove('hidden');
+        imgEl.classList.remove('opacity-0');
         return;
       }
 
-      // Requirement: jangan munculkan gradient saat load. Jadi fallback disembunyikan dulu.
+      // Requirement: jangan munculkan gradient saat load. Jadi fallback disembunyikan.
       fallbackEl.classList.add('hidden');
 
       // Show img immediately (no gradient), fade-in when loaded
       imgEl.classList.remove('hidden');
       imgEl.classList.add('transition-opacity', 'duration-200', 'opacity-0');
 
-      imgEl.onload = () => {
+      const onOk = () => {
         imgEl.classList.remove('opacity-0');
         fallbackEl.classList.add('hidden');
       };
-      imgEl.onerror = () => {
+      const onBad = () => {
         showFallback();
       };
 
-      // Set src (no cache-buster to avoid repeated flicker)
+      imgEl.onload = onOk;
+      imgEl.onerror = onBad;
+
+      // Set src
       if (prev !== u) imgEl.setAttribute('src', u);
       else imgEl.setAttribute('src', u);
+
+      // If cached, force-run handlers
+      if (imgEl.complete) {
+        if (imgEl.naturalWidth > 0) onOk();
+        else onBad();
+      }
     }
 
     function applyStoreProfileToUI() {
@@ -5585,7 +5670,12 @@ service cloud.firestore {
             toast('Logo tersimpan.');
           } catch (e) {
             console.warn(e);
-            toast(e?.message || 'Gagal simpan logo.');
+            const m = String(e?.message || '').toLowerCase();
+            if (m.includes('failed') || m.includes('error') || m.includes('network')) {
+              toast('Gagal simpan logo. Pastikan URL https:// dan host tidak blokir hotlink.');
+            } else {
+              toast(e?.message || 'Gagal simpan logo.');
+            }
           } finally {
             saveProfileLogoBtn.disabled = false;
             saveProfileLogoBtn.classList.remove('opacity-60');
@@ -5663,6 +5753,18 @@ service cloud.firestore {
         applyHeroPreviewBtn._bound = true;
       }
 
+      // Live-preview bindings for hero background settings
+      const heroBgUrlEl = document.getElementById('heroBgImageUrlInput');
+      const heroBgOvEl = document.getElementById('heroBgOverlayInput');
+      if (heroBgUrlEl && !heroBgUrlEl._boundHeroBg) {
+        heroBgUrlEl.addEventListener('input', () => applyHeroPreviewFromInputs());
+        heroBgUrlEl._boundHeroBg = true;
+      }
+      if (heroBgOvEl && !heroBgOvEl._boundHeroBg) {
+        heroBgOvEl.addEventListener('input', () => applyHeroPreviewFromInputs());
+        heroBgOvEl._boundHeroBg = true;
+      }
+
       if (saveHeroBtn && !saveHeroBtn._bound) {
         saveHeroBtn.addEventListener('click', async () => {
           const next = {
@@ -5671,6 +5773,10 @@ service cloud.firestore {
             subheadline: document.getElementById('heroSubheadlineInput')?.value || DEFAULT_HERO.subheadline,
             ctaLabel: document.getElementById('heroCtaLabelInput')?.value || DEFAULT_HERO.ctaLabel,
             ctaAction: document.getElementById('heroCtaActionInput')?.value || DEFAULT_HERO.ctaAction,
+
+            bgImageUrl: document.getElementById('heroBgImageUrlInput')?.value || DEFAULT_HERO.bgImageUrl,
+            bgOverlay: Number(document.getElementById('heroBgOverlayInput')?.value ?? DEFAULT_HERO.bgOverlay),
+
             perksTitle: document.getElementById('heroPerksTitleInput')?.value || DEFAULT_HERO.perksTitle,
             perksSubtitle: document.getElementById('heroPerksSubtitleInput')?.value || DEFAULT_HERO.perksSubtitle,
             perksBullets: document.getElementById('heroPerksBulletsInput')?.value || DEFAULT_HERO.perksBullets
@@ -5706,10 +5812,14 @@ service cloud.firestore {
               setHeroSettings(DEFAULT_HERO);
             }, { reason: 'resetHero' });
             // clear inputs so renderAdminHero re-fill
-            ['heroBadgeInput','heroHeadlineInput','heroSubheadlineInput','heroCtaLabelInput','heroPerksTitleInput','heroPerksSubtitleInput','heroPerksBulletsInput'].forEach(id => {
+            ['heroBadgeInput','heroHeadlineInput','heroSubheadlineInput','heroCtaLabelInput','heroPerksTitleInput','heroPerksSubtitleInput','heroPerksBulletsInput','heroBgImageUrlInput'].forEach(id => {
               const el = document.getElementById(id);
               if (el) el.value = '';
             });
+            const ov = document.getElementById('heroBgOverlayInput');
+            if (ov) ov.value = String(DEFAULT_HERO.bgOverlay);
+            const ovLbl = document.getElementById('heroBgOverlayLabel');
+            if (ovLbl) ovLbl.textContent = `${DEFAULT_HERO.bgOverlay}%`;
             const act = document.getElementById('heroCtaActionInput');
             if (act) act.value = DEFAULT_HERO.ctaAction;
             renderAdminHero();
