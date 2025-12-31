@@ -42,14 +42,14 @@
   <header class="sticky top-0 z-40 border-b bg-white/80 glass">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex min-h-[140px] items-center justify-between gap-3 py-3">
-        <button id="brandBtn" type="button" class="flex items-center gap-3 text-left select-none" title="Double click untuk Maintain Profile (Admin)">
+        <button id="brandBtn" type="button" class="flex items-center gap-3 text-left select-none" title="Varsha Fruits and Goods">
           <div class="h-[120px] w-[120px] rounded-3xl overflow-hidden border border-slate-200 bg-white">
             <div id="storeLogoFallback" class="h-full w-full bg-gradient-to-br from-emerald-500 to-lime-400"></div>
             <img id="storeLogoImg" alt="Logo" class="hidden h-full w-full object-cover" referrerpolicy="no-referrer" decoding="async" loading="eager" />
           </div>
           <div>
-            <div id="storeNameHeader" class="text-sm font-semibold leading-4">Varsha</div>
-            <div id="storeTaglineHeader" class="text-xs text-slate-500 leading-4">Fruits and Goods</div>
+            <div id="storeNameHeader" class="text-[28px] font-semibold leading-[1.1]">Varsha</div>
+            <div id="storeTaglineHeader" class="text-[20px] text-slate-500 leading-[1.1]">Fruits and Goods</div>
           </div>
         </button>
 
@@ -385,7 +385,7 @@
       <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
         <div>
           <h2 class="text-2xl font-extrabold">Maintain Profile Toko</h2>
-          <p class="text-sm text-slate-500">Ubah logo, nama toko, rekening pembayaran, dan alamat toko. Akses: double click logo (khusus Admin + kode referensi).</p>
+          <p class="text-sm text-slate-500">Ubah logo, nama toko, rekening pembayaran, dan alamat toko. Akses: menu <b>Laporan</b> (khusus Admin + kode referensi).</p>
         </div>
         <div class="flex gap-2">
           <button id="resetProfileBtn" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50">Reset</button>
@@ -433,24 +433,19 @@
             <div class="rounded-2xl border p-3">
               <div class="text-xs font-bold text-slate-700">Logo Toko</div>
               <div class="mt-2 flex items-start gap-3">
-                <img id="profileLogoPreview" class="h-[120px] w-[120px] rounded-3xl object-cover border bg-slate-50" alt="Preview" src="https://images.unsplash.com/photo-1541976590-713941681591?auto=format&fit=crop&w=200&q=60" referrerpolicy="no-referrer" decoding="async" loading="lazy" />
+                <div class="h-[120px] w-[120px] rounded-3xl overflow-hidden border bg-white">
+                  <div id="profileLogoPreviewFallback" class="h-full w-full bg-gradient-to-br from-emerald-500 to-lime-400"></div>
+                  <img id="profileLogoPreview" class="hidden h-full w-full object-cover" alt="Preview" referrerpolicy="no-referrer" decoding="async" loading="lazy" />
+                </div>
                 <div class="flex-1">
                   <div class="flex flex-col sm:flex-row gap-2">
-                    <input id="profileLogoFile" type="file" accept="image/*" class="block w-full text-sm file:mr-3 file:rounded-xl file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-slate-800" />
-                    <button id="uploadProfileLogoBtn" type="button" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50">Upload</button>
                     <button id="saveProfileLogoBtn" type="button" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Simpan Logo</button>
                   </div>
-                  <div id="profileUploadProgressWrap" class="hidden mt-2">
-                    <div class="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
-                      <div id="profileUploadProgressBar" class="h-2 bg-emerald-600" style="width:0%"></div>
-                    </div>
-                    <div id="profileUploadProgressText" class="mt-1 text-xs text-slate-500">0%</div>
-                  </div>
-                  <div class="mt-2 text-xs text-slate-500">Upload disimpan di <b>Firebase Storage</b> pada Shop ID yang sama (butuh Cloud Sync tersambung). Setelah upload, klik <b>Simpan Logo</b> untuk menerapkan di toko. Atau tempel URL logo di bawah lalu klik <b>Simpan Logo</b>.</div>
+                  <div class="mt-2 text-xs text-slate-500">Isi URL logo di bawah lalu klik <b>Simpan Logo</b>.</div>
                 </div>
               </div>
               <div class="mt-3">
-                <label class="text-xs text-slate-500">URL Logo (opsional)</label>
+                <label class="text-xs text-slate-500">URL Logo</label>
                 <input id="profileLogoUrl" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm font-mono" placeholder="https://..." />
               </div>
             </div>
@@ -478,8 +473,8 @@
                 <img id="profilePreviewLogoImg" class="hidden h-full w-full object-cover" alt="Logo" referrerpolicy="no-referrer" decoding="async" loading="eager" />
               </div>
               <div>
-                <div id="profilePreviewName" class="text-sm font-extrabold">Varsha</div>
-                <div id="profilePreviewTagline" class="text-xs text-slate-500">Fruits and Goods</div>
+                <div id="profilePreviewName" class="text-[28px] font-extrabold leading-[1.1]">Varsha</div>
+                <div id="profilePreviewTagline" class="text-[20px] text-slate-500 leading-[1.1]">Fruits and Goods</div>
               </div>
             </div>
             <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -1001,6 +996,17 @@
             </div>
             <button id="openCloudSyncBtnReports" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800">Buka Cloud Sync</button>
           </div>
+        </div>
+
+        <div class="lg:col-span-12 rounded-2xl border bg-white p-4">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <div class="text-sm font-semibold">Maintain Profile Toko</div>
+              <div class="mt-1 text-xs text-slate-500">Ubah logo, nama toko, rekening pembayaran, dan alamat. Akses membutuhkan <b>Kode Referensi Admin</b>.</div>
+            </div>
+            <button id="openMaintainProfileBtnReports" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Buka Maintain Profile</button>
+          </div>
+          <div class="mt-2 text-xs text-slate-500">Tips: Jika tombol tidak bisa dibuka, pastikan kamu login sebagai <b>Admin</b>.</div>
         </div>
 
         <div class="lg:col-span-12 rounded-2xl border bg-white p-4">
@@ -1536,8 +1542,8 @@ service cloud.firestore {
             <img id="storeLogoAuthImg" alt="Logo" class="hidden h-full w-full object-cover" referrerpolicy="no-referrer" decoding="async" loading="eager" />
           </div>
           <div>
-            <div id="storeNameAuth" class="text-sm font-extrabold leading-4">Varsha</div>
-            <div id="storeTaglineAuth" class="text-xs text-slate-500 leading-4">Fruits and Goods</div>
+            <div id="storeNameAuth" class="text-[28px] font-extrabold leading-[1.1]">Varsha</div>
+            <div id="storeTaglineAuth" class="text-[20px] text-slate-500 leading-[1.1]">Fruits and Goods</div>
           </div>
         </div>
         <button class="rounded-lg p-2 hover:bg-slate-100" data-close="authModal" aria-label="Tutup">
@@ -1946,7 +1952,9 @@ service cloud.firestore {
       custShipSearch: '',
       custShipStatus: '',
       dashboardRange: { from: '', to: '' },
-      charts: { line: null, donut: null }
+      charts: { line: null, donut: null },
+      // Temporary gate for Maintain Profile access (must enter Admin Reference Code)
+      adminRefOkUntil: 0
     };
 
     /**********************
@@ -2378,34 +2386,46 @@ service cloud.firestore {
       imgEl.onload = null;
       imgEl.onerror = null;
 
-      // Some URLs won't load on mobile due to hotlink/referrer/CORS restrictions.
-      // Strategy: show fallback first, then only hide it after the image loads.
-      if (!u || u.startsWith('blob:') || u.startsWith('file:')) {
+      const showFallback = () => {
         try { imgEl.removeAttribute('src'); } catch {}
         imgEl.classList.add('hidden');
+        imgEl.classList.remove('opacity-0');
         fallbackEl.classList.remove('hidden');
+      };
+
+      // Empty / invalid url => show fallback
+      if (!u || u.startsWith('blob:') || u.startsWith('file:')) {
+        showFallback();
         return;
       }
 
-      // Always show fallback while loading
-      imgEl.classList.add('hidden');
-      fallbackEl.classList.remove('hidden');
+      const prev = String(imgEl.getAttribute('src') || '').trim();
+      const isVisible = !imgEl.classList.contains('hidden');
+
+      // If already displaying the same image successfully, do nothing (avoid flicker)
+      if (prev === u && isVisible && !imgEl.classList.contains('opacity-0')) {
+        fallbackEl.classList.add('hidden');
+        return;
+      }
+
+      // Requirement: jangan munculkan gradient saat load. Jadi fallback disembunyikan dulu.
+      fallbackEl.classList.add('hidden');
+
+      // Show img immediately (no gradient), fade-in when loaded
+      imgEl.classList.remove('hidden');
+      imgEl.classList.add('transition-opacity', 'duration-200', 'opacity-0');
 
       imgEl.onload = () => {
-        imgEl.classList.remove('hidden');
+        imgEl.classList.remove('opacity-0');
         fallbackEl.classList.add('hidden');
       };
       imgEl.onerror = () => {
-        // Keep fallback visible
-        try { imgEl.removeAttribute('src'); } catch {}
-        imgEl.classList.add('hidden');
-        fallbackEl.classList.remove('hidden');
+        showFallback();
       };
 
-      // force reload if same URL
-      const prev = imgEl.getAttribute('src') || '';
+      // Set src (no cache-buster to avoid repeated flicker)
       if (prev !== u) imgEl.setAttribute('src', u);
-      else imgEl.setAttribute('src', u + (u.includes('?') ? '&' : '?') + 'v=' + Date.now());
+      else imgEl.setAttribute('src', u);
     }
 
     function applyStoreProfileToUI() {
@@ -2446,15 +2466,17 @@ service cloud.firestore {
 
     function updateProfileLogoPreview(url) {
       const img = document.getElementById('profileLogoPreview');
-      const fallback = 'https://images.unsplash.com/photo-1541976590-713941681591?auto=format&fit=crop&w=200&q=60';
+      const fb = document.getElementById('profileLogoPreviewFallback');
+      if (img && fb) {
+        setImgWithFallback(img, fb, url);
+        return;
+      }
+      // Fallback minimal jika elemen preview lama masih tersisa
       if (!img) return;
       const u = String(url || '').trim();
-
-      img.onerror = () => {
-        img.src = fallback;
-      };
-
-      img.src = u || fallback;
+      img.onload = null;
+      img.onerror = null;
+      img.src = u;
     }
 
     function applyProfilePreviewFromInputs() {
@@ -2608,6 +2630,22 @@ service cloud.firestore {
       // guard: admin doesn't need customer shipping view
       if (String(route || '') === 'customer.shipping' && isAdmin()) {
         route = 'admin.dashboard';
+      }
+
+      // guard: Maintain Profile requires Admin Reference Code (even for admin)
+      if (String(route || '') === 'admin.profile' && isAdmin()) {
+        const ok = Date.now() < Number(state.adminRefOkUntil || 0);
+        if (!ok) {
+          const code = prompt('Masukkan Kode Referensi Admin untuk akses Maintain Profile:');
+          if (code === null) return; // cancel
+          const ADMIN_REF_HASH = 'e12d51b1';
+          if (simpleHash(String(code).trim()) !== ADMIN_REF_HASH) {
+            toast('Kode referensi tidak valid.');
+            route = 'admin.reports';
+          } else {
+            state.adminRefOkUntil = Date.now() + 10 * 60 * 1000; // 10 menit
+          }
+        }
       }
 
       state.route = route;
@@ -5216,10 +5254,10 @@ service cloud.firestore {
         openCloudSyncBtnReports._boundOpen = true;
       }
 
-      // Hidden access: double click logo -> Maintain Profile (Admin + kode referensi)
-      const brandBtn = document.getElementById('brandBtn');
-      if (brandBtn && !brandBtn._boundDbl) {
-        brandBtn.addEventListener('dblclick', async () => {
+      // Maintain Profile access moved to Reports (Admin + kode referensi)
+      const openMaintainProfileBtnReports = document.getElementById('openMaintainProfileBtnReports');
+      if (openMaintainProfileBtnReports && !openMaintainProfileBtnReports._bound) {
+        openMaintainProfileBtnReports.addEventListener('click', async () => {
           if (!isAdmin()) {
             toast('Akses ditolak. Khusus Admin.');
             return;
@@ -5233,13 +5271,15 @@ service cloud.firestore {
               toast('Kode referensi tidak valid.');
               return;
             }
+            // grant temporary access then open
+            state.adminRefOkUntil = Date.now() + 10 * 60 * 1000;
             routeTo('admin.profile');
           } catch (e) {
             console.warn(e);
             toast('Gagal membuka Maintain Profile.');
           }
         });
-        brandBtn._boundDbl = true;
+        openMaintainProfileBtnReports._bound = true;
       }
 
       // Auth
@@ -5283,6 +5323,8 @@ service cloud.firestore {
         try {
           if (cloud?.connected) await cloudDisconnect({ silent: true });
         } catch {}
+        // revoke Maintain Profile access
+        try { state.adminRefOkUntil = 0; } catch {}
         authLogout();
         toast('Berhasil keluar.');
         applyRoleUI();
@@ -5505,7 +5547,6 @@ service cloud.firestore {
       const applyProfilePreviewBtn = document.getElementById('applyProfilePreviewBtn');
       const saveProfileBtn = document.getElementById('saveProfileBtn');
       const resetProfileBtn = document.getElementById('resetProfileBtn');
-      const uploadProfileLogoBtn = document.getElementById('uploadProfileLogoBtn');
       const saveProfileLogoBtn = document.getElementById('saveProfileLogoBtn');
       const profileLogoUrlEl = document.getElementById('profileLogoUrl');
 
@@ -5516,32 +5557,6 @@ service cloud.firestore {
       if (profileLogoUrlEl && !profileLogoUrlEl._boundPreview) {
         profileLogoUrlEl.addEventListener('input', () => applyProfilePreviewFromInputs());
         profileLogoUrlEl._boundPreview = true;
-      }
-
-      if (uploadProfileLogoBtn && !uploadProfileLogoBtn._bound) {
-        uploadProfileLogoBtn.addEventListener('click', async () => {
-          const fileEl = document.getElementById('profileLogoFile');
-          const urlEl = document.getElementById('profileLogoUrl');
-          const file = fileEl?.files?.[0];
-          try {
-            uploadProfileLogoBtn.disabled = true;
-            uploadProfileLogoBtn.classList.add('opacity-60');
-            uploadProfileLogoBtn.textContent = 'Uploading...';
-            const { url } = await uploadStoreLogoToCloud(file);
-            if (urlEl) urlEl.value = url;
-            applyProfilePreviewFromInputs();
-            toast('Upload logo berhasil. Klik Simpan untuk menerapkan.');
-          } catch (e) {
-            console.warn(e);
-            toast(e?.message || 'Gagal upload logo.');
-            showCloudError(e);
-          } finally {
-            uploadProfileLogoBtn.disabled = false;
-            uploadProfileLogoBtn.classList.remove('opacity-60');
-            uploadProfileLogoBtn.textContent = 'Upload';
-          }
-        });
-        uploadProfileLogoBtn._bound = true;
       }
 
       if (saveProfileLogoBtn && !saveProfileLogoBtn._bound) {
