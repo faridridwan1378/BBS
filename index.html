@@ -28,6 +28,13 @@
     .no-spin { -moz-appearance: textfield; }
     .fade-in { animation: fadeIn .25s ease-out; }
     @keyframes fadeIn { from { opacity: .25; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
+
+    /* When customer footer is visible we add body.pb-24; lift toast a bit */
+    body.pb-24 #toast { bottom: 5.5rem; }
+
+    /* Active route (header + sidebar) */
+    .route-btn.active-route { background: #0f172a; color: white; }
+    .route-btn.active-route:hover { background: #1e293b; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -45,22 +52,32 @@
 
         <nav class="hidden md:flex items-center gap-1">
           <button data-route="market" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100">Marketplace</button>
-          <button data-route="admin.dashboard" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100">Admin • Dashboard</button>
-          <button data-route="admin.products" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100">Produk</button>
-          <button data-route="admin.purchases" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100">Pembelian</button>
-          <button data-route="admin.promos" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100">Promo</button>
-          <button data-route="admin.transactions" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100">Transaksi</button>
-          <button data-route="admin.reports" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100">Laporan</button>
+          <button data-route="admin.dashboard" class="route-btn admin-only rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100">Admin • Dashboard</button>
         </nav>
 
         <div class="flex items-center gap-2">
-          <button id="mobileMenuBtn" class="md:hidden rounded-lg p-2 hover:bg-slate-100" aria-label="Menu">
+          <button id="mobileMenuBtn" class="admin-only md:hidden rounded-lg p-2 hover:bg-slate-100" aria-label="Menu">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
 
-          <div id="cloudNavStatus" class="hidden md:inline-flex items-center gap-2 rounded-full border bg-white px-3 py-2 text-xs font-semibold">
+          <button id="cloudNavStatus" type="button" class="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-2 text-xs font-semibold hover:bg-slate-50" title="Cloud Sync (klik untuk buka pengaturan)">
             <span id="cloudNavDot" class="h-2 w-2 rounded-full bg-slate-300"></span>
             <span id="cloudNavText">Cloud: Offline</span>
+          </button>
+
+          <button id="reloadBtn" class="rounded-lg p-2 hover:bg-slate-100" title="Reload data (Pull dari Cloud jika tersedia)" aria-label="Reload">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-9-9 9 9 0 0 1 9-9c2.2 0 4.2.8 5.8 2.1"/><path d="M21 3v6h-6"/></svg>
+          </button>
+
+          <button id="openAuthBtn" class="rounded-lg px-3 py-2 text-sm font-semibold border hover:bg-slate-100">Masuk</button>
+
+          <div id="userNav" class="hidden items-center gap-2">
+            <div id="userChip" class="hidden sm:inline-flex items-center gap-2 rounded-full border bg-white px-3 py-2 text-xs font-semibold">
+              <span id="userNameLabel" class="max-w-[140px] truncate">User</span>
+              <span id="userRoleLabel" class="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-extrabold text-white">CUSTOMER</span>
+            </div>
+            <!-- Logout (default position, for Admin). For Customer, this will be hidden and shown in the row below. -->
+            <button id="logoutBtn" class="rounded-lg px-3 py-2 text-sm font-semibold border hover:bg-slate-100">Keluar</button>
           </div>
 
           <button id="openCartBtn" class="relative rounded-lg px-3 py-2 text-sm font-semibold bg-emerald-600 text-white hover:bg-emerald-700">
@@ -70,15 +87,11 @@
         </div>
       </div>
 
+
       <div id="mobileNav" class="md:hidden hidden pb-3">
         <div class="grid grid-cols-2 gap-2">
           <button data-route="market" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100 border">Marketplace</button>
-          <button data-route="admin.dashboard" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100 border">Admin • Dashboard</button>
-          <button data-route="admin.products" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100 border">Produk</button>
-          <button data-route="admin.purchases" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100 border">Pembelian</button>
-          <button data-route="admin.promos" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100 border">Promo</button>
-          <button data-route="admin.transactions" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100 border">Transaksi</button>
-          <button data-route="admin.reports" class="route-btn rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100 border">Laporan</button>
+          <button data-route="admin.dashboard" class="route-btn admin-only rounded-lg px-3 py-2 text-sm font-medium hover:bg-slate-100 border">Admin • Dashboard</button>
         </div>
       </div>
     </div>
@@ -99,7 +112,7 @@
               <p class="mt-3 text-white/90">Pilih buah lokal, impor, musiman, dan tropis. Promo berjalan otomatis, stok real-time, checkout sederhana.</p>
               <div class="mt-5 flex flex-wrap gap-2">
                 <button class="rounded-xl bg-white text-emerald-700 px-4 py-2 text-sm font-bold hover:bg-white/95" id="scrollToProductsBtn">Lihat Produk</button>
-                <button class="rounded-xl bg-white/15 text-white px-4 py-2 text-sm font-semibold hover:bg-white/20" data-route="admin.dashboard">Masuk Admin</button>
+                <button class="admin-only rounded-xl bg-white/15 text-white px-4 py-2 text-sm font-semibold hover:bg-white/20" data-route="admin.dashboard">Masuk Admin</button>
               </div>
             </div>
             <div class="w-full lg:w-[420px]">
@@ -129,7 +142,7 @@
             <div class="text-sm font-semibold">Promo Berjalan</div>
             <div class="text-xs text-slate-500">Banner animasi (otomatis menampilkan promo aktif)</div>
           </div>
-          <button id="managePromosQuickBtn" class="text-sm font-semibold text-emerald-700 hover:underline" data-route="admin.promos">Kelola Promo</button>
+          <button id="managePromosQuickBtn" class="admin-only text-sm font-semibold text-emerald-700 hover:underline" data-route="admin.promos">Kelola Promo</button>
         </div>
         <div class="mt-3 promo-marquee rounded-xl bg-gradient-to-r from-emerald-50 to-lime-50 border">
           <div id="promoTrack" class="promo-track py-2"></div>
@@ -194,6 +207,10 @@
         <div class="mt-1 text-sm text-slate-500">Coba ganti kategori atau kata kunci.</div>
       </div>
     </section>
+
+    <!-- ADMIN LAYOUT (Admin Views) -->
+    <div id="adminLayout" class="admin-only hidden">
+      <div>
 
     <!-- ADMIN DASHBOARD -->
     <section id="view-admin-dashboard" class="view hidden fade-in">
@@ -273,12 +290,15 @@
       </div>
 
       <div class="mt-6 rounded-2xl border bg-white p-4">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-3">
           <div>
             <div class="text-sm font-semibold">Transaksi Terbaru</div>
             <div class="text-xs text-slate-500">Maks. 8 transaksi terakhir</div>
           </div>
-          <button class="text-sm font-semibold text-emerald-700 hover:underline" data-route="admin.transactions">Lihat semua</button>
+          <div class="flex items-center gap-3">
+            <button class="text-sm font-semibold text-sky-700 hover:underline" data-route="admin.shipping">Kelola Pengiriman</button>
+            <button class="text-sm font-semibold text-emerald-700 hover:underline" data-route="admin.transactions">Lihat semua</button>
+          </div>
         </div>
         <div class="mt-3 overflow-auto">
           <table class="min-w-full text-sm">
@@ -581,6 +601,72 @@
       </div>
     </section>
 
+    <!-- ADMIN SHIPPING -->
+    <section id="view-admin-shipping" class="view hidden fade-in">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-extrabold">Pengelolaan Pengiriman</h2>
+          <p class="text-sm text-slate-500">Kelola status pengiriman, biaya ongkir, dan kirim konfirmasi total tagihan ke customer (via WhatsApp).</p>
+        </div>
+        <div class="flex gap-2">
+          <button id="exportShippingCsv" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50">Ekspor Pengiriman CSV</button>
+        </div>
+      </div>
+
+      <div class="mt-4 rounded-2xl border bg-white p-4">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <input id="shipSearch" class="w-full md:w-96 rounded-xl border px-3 py-2 text-sm" placeholder="Cari ID / nama / WA / alamat..." />
+            <button id="shipSearchReset" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Reset</button>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-xs text-slate-500">Status</label>
+            <select id="shipStatusFilter" class="rounded-xl border bg-white px-3 py-2 text-sm">
+              <option value="">Semua</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Diproses</option>
+              <option value="shipped">Dikirim</option>
+              <option value="delivered">Selesai</option>
+              <option value="canceled">Batal</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4 overflow-auto">
+          <table class="min-w-full text-sm">
+            <thead class="text-xs text-slate-500">
+              <tr class="border-b">
+                <th class="py-2 text-left font-semibold">ID</th>
+                <th class="py-2 text-left font-semibold">Tanggal</th>
+                <th class="py-2 text-left font-semibold">Pembeli</th>
+                <th class="py-2 text-left font-semibold">Alamat</th>
+                <th class="py-2 text-left font-semibold">Total Item</th>
+                <th class="py-2 text-left font-semibold">Ongkir</th>
+                <th class="py-2 text-left font-semibold">Tagihan</th>
+                <th class="py-2 text-left font-semibold">Status</th>
+                <th class="py-2 text-right font-semibold">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="shipBody"></tbody>
+          </table>
+        </div>
+
+        <div id="shipEmpty" class="hidden mt-6 rounded-xl border bg-slate-50 p-6 text-center">
+          <div class="font-semibold">Belum ada order</div>
+          <div class="text-sm text-slate-500 mt-1">Order berasal dari checkout customer di Marketplace.</div>
+        </div>
+      </div>
+
+      <div class="mt-4 rounded-2xl border bg-white p-4">
+        <div class="text-sm font-semibold">Catatan</div>
+        <ul class="mt-2 list-disc pl-5 text-sm text-slate-600 space-y-1">
+          <li>Status pengiriman dan ongkir disimpan di transaksi (field <span class="font-mono">shipping</span>), sehingga ikut tersinkron via Cloud Sync.</li>
+          <li>Gunakan tombol <b>Kirim Tagihan</b> untuk mengirim konfirmasi total tagihan (total item + ongkir) ke WhatsApp customer.</li>
+          <li>Waktu konfirmasi (WA) akan tercatat dan ikut masuk laporan (CSV).</li>
+        </ul>
+      </div>
+    </section>
+
     <!-- ADMIN REPORTS -->
     <section id="view-admin-reports" class="view hidden fade-in">
       <div>
@@ -623,54 +709,12 @@
         </div>
 
         <div class="lg:col-span-12 rounded-2xl border bg-white p-4">
-          <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-            <div class="max-w-xl">
-              <div class="text-sm font-semibold">Cloud Sync (Firebase) • Multi Gadget</div>
-              <div class="mt-1 text-xs text-slate-500">Sinkron real-time antar perangkat memakai Firebase Firestore. Semua gadget harus memakai <b>Firebase config</b> dan <b>Shop ID</b> yang sama.</div>
-              <div class="mt-3 rounded-xl border bg-amber-50 p-3 text-xs text-amber-900">
-                <div class="font-extrabold">Penting (Setup & Biaya)</div>
-                <ul class="mt-2 list-disc pl-5 space-y-1">
-                  <li>Fitur ini membutuhkan project Firebase milik Anda. Jika belum ada, buat di console.firebase.google.com → aktifkan <b>Firestore</b> dan <b>Anonymous Auth</b>.</li>
-                  <li><b>Firebase ada paket gratis (Spark)</b> dengan kuota. Jika pemakaian melewati kuota (misalnya banyak transaksi/gambar/bandwidth), bisa muncul kebutuhan upgrade ke <b>Blaze (pay-as-you-go)</b>.</li>
-                  <li>Untuk aman: pantau tab <b>Usage</b>, buat <b>Budget alert</b> di Google Cloud Billing (kalau pakai Blaze), dan batasi upload gambar berukuran besar.</li>
-                </ul>
-                <div class="mt-2">Referensi: <a class="font-semibold underline" target="_blank" href="https://firebase.google.com/pricing">firebase.google.com/pricing</a></div>
-              </div>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <div class="text-sm font-semibold">Cloud Sync (Firebase)</div>
+              <div class="mt-1 text-xs text-slate-500">Pengaturan Cloud Sync ada di tombol <b>Cloud: ...</b> di header (klik untuk membuka). Bisa juga dibuka dari tombol di samping.</div>
             </div>
-            <div class="flex flex-col sm:flex-row gap-2">
-              <button id="cloudConnectBtn" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800">Connect</button>
-              <button id="cloudDisconnectBtn" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50">Disconnect</button>
-            </div>
-          </div>
-
-          <div class="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
-            <div class="lg:col-span-4">
-              <label class="text-xs text-slate-500">Shop ID (bebas, tapi harus sama di semua gadget)</label>
-              <input id="cloudShopId" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="cth: varsha-store-01" />
-              <div class="mt-2 text-xs text-slate-500">Shop ID memisahkan data antar toko. <b>Gunakan Shop ID yang sama</b> di semua gadget agar sinkron.</div>
-            </div>
-            <div class="lg:col-span-8">
-              <label class="text-xs text-slate-500">Firebase Config (tempel JSON <span class="font-semibold">atau</span> snippet <span class="font-mono">const firebaseConfig = {...};</span> dari Firebase Console → Project settings)</label>
-              <textarea id="cloudConfigJson" rows="6" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm font-mono" placeholder='{"apiKey":"...","authDomain":"...","projectId":"..."}'></textarea>
-              <div class="mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div id="cloudStatus" class="text-xs text-slate-600">Status: <span class="font-semibold">Offline</span></div>
-                <div class="flex flex-wrap gap-2">
-                  <button id="cloudFillDefaultBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50" title="Isi otomatis config default">Gunakan Config Default</button>
-                  <button id="cloudClearConfigBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50" title="Kosongkan field config">Clear</button>
-                  <button id="cloudTestStorageBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50" title="Cek apakah Firebase Storage aktif & rules mengizinkan upload">Test Storage</button>
-                  <button id="cloudPullBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Pull (Ambil dari Cloud)</button>
-                  <button id="cloudPushBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Push (Kirim ke Cloud)</button>
-                </div>
-              </div>
-
-              <div id="cloudErrorWrap" class="hidden mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-900">
-                <div class="font-extrabold">Cloud Error / Troubleshooting</div>
-                <div id="cloudErrorText" class="mt-1 font-mono break-all"></div>
-                <div id="cloudErrorHints" class="mt-2 text-rose-900"></div>
-              </div>
-
-              <div class="mt-2 text-xs text-slate-500">Config default sudah disiapkan untuk project <b>belanja-buah-segar</b> (boleh diganti jika perlu). Jika konflik terjadi, tombol <b>Push</b> akan menimpa data cloud dengan data gadget ini. Tombol <b>Pull</b> menimpa data gadget ini dengan data cloud.</div>
-            </div>
+            <button id="openCloudSyncBtnReports" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800">Buka Cloud Sync</button>
           </div>
         </div>
 
@@ -718,6 +762,19 @@
                 <button id="saveOrderWebhookBtn" class="rounded-xl bg-emerald-600 px-3 py-2 text-sm font-bold text-white hover:bg-emerald-700">Simpan Setting</button>
               </div>
               <div id="orderWebhookStatus" class="mt-3 text-xs text-slate-600">Status: <span class="font-semibold">Nonaktif</span></div>
+
+              <div class="mt-4 rounded-xl border bg-white p-3">
+                <div class="text-sm font-extrabold">Nomor WhatsApp Admin (opsional)</div>
+                <div class="mt-2">
+                  <label class="text-xs text-slate-500">Nomor WA</label>
+                  <input id="adminWhatsAppInput" class="mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm font-mono" placeholder="cth: 0812xxxx atau +62812xxxx" />
+                </div>
+                <div class="mt-2 flex gap-2">
+                  <button id="saveAdminWhatsAppBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Simpan Nomor</button>
+                  <button id="clearAdminWhatsAppBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Hapus</button>
+                </div>
+                <div class="mt-2 text-xs text-slate-500">Nomor ini disimpan di perangkat (localStorage). Jika kosong, sistem akan meminta saat checkout.</div>
+              </div>
 
               <details class="mt-3 rounded-xl border bg-white p-3">
                 <summary class="cursor-pointer text-sm font-extrabold text-slate-900">Contoh Webhook URL & cara membuat (klik)</summary>
@@ -914,6 +971,72 @@ service firebase.storage {
       </div>
 
       <div class="mt-4 rounded-2xl border bg-white p-4">
+        <details class="group">
+          <summary class="cursor-pointer list-none select-none flex items-center justify-between gap-3">
+            <div>
+              <div class="text-sm font-extrabold">Mode Produksi: Auth & Role yang aman (Firebase Auth)</div>
+              <div class="text-xs text-slate-500">Panduan agar login/role admin-customer aman (bukan sekadar pembatasan UI).</div>
+            </div>
+            <div class="rounded-xl border px-3 py-1.5 text-sm font-semibold group-open:bg-slate-900 group-open:text-white">Lihat</div>
+          </summary>
+
+          <div class="mt-3 grid grid-cols-1 lg:grid-cols-12 gap-4 text-sm text-slate-700">
+            <div class="lg:col-span-6 rounded-xl border bg-slate-50 p-3">
+              <div class="font-bold">1) Aktifkan Firebase Auth (Email/Password)</div>
+              <ol class="mt-2 list-decimal pl-5 space-y-1 text-slate-600">
+                <li>Firebase Console → <b>Authentication</b> → <b>Sign-in method</b></li>
+                <li>Enable <b>Email/Password</b></li>
+                <li>(Opsional) tetap enable <b>Anonymous</b> jika ingin mode guest.</li>
+              </ol>
+              <div class="mt-2 text-xs text-slate-500">Catatan: login berbasis localStorage di web ini cocok untuk demo, tapi tidak aman untuk produksi.</div>
+            </div>
+
+            <div class="lg:col-span-6 rounded-xl border bg-slate-50 p-3">
+              <div class="font-bold">2) Role admin/customer yang aman = Custom Claims</div>
+              <div class="mt-2 text-slate-600 text-sm">
+                Untuk produksi, role <b>tidak boleh</b> disimpan dan dipercaya dari browser. Cara umum:
+                <ul class="mt-2 list-disc pl-5 space-y-1">
+                  <li>Tentukan admin dari server (Cloud Functions / server kamu).</li>
+                  <li>Set <b>Custom Claims</b> pada user admin (mis. <span class="font-mono">{ admin: true }</span>).</li>
+                  <li>Firestore Rules memeriksa claim tersebut.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="lg:col-span-12 rounded-xl border bg-white p-3">
+              <div class="flex items-center justify-between gap-2">
+                <div class="font-bold">Contoh Firestore Rules produksi (role admin via Custom Claims)</div>
+              </div>
+              <pre class="mt-2 overflow-auto rounded-xl border bg-slate-50 p-3 text-xs text-slate-800"><code>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null &amp;&amp; request.auth.token.admin == true;
+    }
+
+    // Contoh: hanya admin boleh write data toko
+    match /varsha_shops/{shopId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}</code></pre>
+              <div class="mt-2 text-xs text-slate-500">Catatan: aturan ini contoh. Sesuaikan kebutuhan (mis. customer boleh read katalog, admin write stok/transaksi).</div>
+            </div>
+
+            <div class="lg:col-span-12 rounded-xl border bg-amber-50 p-3 text-amber-900">
+              <div class="font-extrabold">Kenapa perlu ini?</div>
+              <div class="mt-1 text-xs">Karena pembatasan menu di UI saja bisa dibypass. Yang benar: batasi akses di <b>Rules</b> atau server.</div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="mt-4 rounded-2xl border bg-white p-4">
         <div class="text-sm font-semibold">Catatan</div>
         <ul class="mt-2 list-disc pl-5 text-sm text-slate-600 space-y-1">
           <li>CSV kompatibel dengan Excel (gunakan delimiter koma). Jika Excel regional memakai titik-koma, gunakan fitur import CSV.</li>
@@ -923,10 +1046,15 @@ service firebase.storage {
         </ul>
       </div>
     </section>
+
+      </div>
+    </div>
+
+
   </main>
 
   <!-- Cart Drawer -->
-  <div id="cartOverlay" class="fixed inset-0 z-50 hidden">
+  <div id="cartOverlay" class="fixed inset-0 z-[80] hidden">
     <div class="absolute inset-0 bg-black/40" id="closeCartArea"></div>
     <aside class="absolute right-0 top-0 h-full w-full sm:w-[420px] bg-white shadow-2xl border-l fade-in">
       <div class="flex items-center justify-between p-4 border-b">
@@ -960,7 +1088,7 @@ service firebase.storage {
   </div>
 
   <!-- Product Modal (Add/Edit) -->
-  <div id="productModal" class="fixed inset-0 z-50 hidden">
+  <div id="productModal" class="fixed inset-0 z-[80] hidden">
     <div class="absolute inset-0 bg-black/40" data-close="productModal"></div>
     <div class="absolute left-1/2 top-1/2 w-[95vw] max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white shadow-2xl border fade-in">
       <div class="flex items-center justify-between p-4 border-b">
@@ -1045,11 +1173,166 @@ service firebase.storage {
     </div>
   </div>
 
-  <!-- Checkout Modal -->
-  <div id="checkoutModal" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-black/40" data-close="checkoutModal"></div>
+  <!-- Cloud Sync Modal (Firebase) - Accessible for all roles -->
+  <div id="cloudSyncModal" class="fixed inset-0 z-[80] hidden">
+    <div class="absolute inset-0 bg-black/40" data-close="cloudSyncModal"></div>
+    <div class="absolute left-1/2 top-1/2 w-[95vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white shadow-2xl border fade-in">
+      <div class="flex items-center justify-between p-4 border-b">
+        <div>
+          <div class="text-base font-extrabold">Cloud Sync (Firebase)</div>
+          <div class="text-xs text-slate-500">Multi gadget • Sinkron real-time via Firestore + Storage (upload gambar)</div>
+        </div>
+        <button class="rounded-lg p-2 hover:bg-slate-100" data-close="cloudSyncModal" aria-label="Tutup">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-4">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+          <div class="max-w-xl">
+            <div class="text-sm font-semibold">Penting</div>
+            <div class="mt-1 text-xs text-slate-600">Semua gadget harus memakai <b>Shop ID</b> dan <b>Firebase Config</b> yang sama. Auth yang dipakai adalah <b>Anonymous Auth</b>.</div>
+            <div class="mt-2 rounded-xl border bg-amber-50 p-3 text-xs text-amber-900">
+              <div class="font-extrabold">Setup wajib di Firebase Console</div>
+              <ul class="mt-2 list-disc pl-5 space-y-1">
+                <li>Build → <b>Authentication</b> → Sign-in method → enable <b>Anonymous</b></li>
+                <li>Build → <b>Firestore Database</b> → aktifkan + set Rules</li>
+                <li>Build → <b>Storage</b> → Get started + set Rules (kalau mau upload gambar)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button id="cloudConnectBtn" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800">Connect</button>
+            <button id="cloudDisconnectBtn" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50">Disconnect</button>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div class="lg:col-span-4">
+            <label class="text-xs text-slate-500">Shop ID (harus sama di semua gadget)</label>
+            <input id="cloudShopId" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="cth: varsha-shop-01" />
+            <div class="mt-2 text-xs text-slate-500">Shop ID memisahkan data antar toko. Gunakan ID yang sama agar sinkron.</div>
+          </div>
+          <div class="lg:col-span-8">
+            <label class="text-xs text-slate-500">Firebase Config (tempel JSON <span class="font-semibold">atau</span> snippet <span class="font-mono">const firebaseConfig = {...};</span>)</label>
+            <textarea id="cloudConfigJson" rows="6" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm font-mono" placeholder='{"apiKey":"...","authDomain":"...","projectId":"..."}'></textarea>
+
+            <div class="mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div id="cloudStatus" class="text-xs text-slate-600">Status: <span class="font-semibold">Offline</span></div>
+              <div class="flex flex-wrap gap-2">
+                <button id="cloudFillDefaultBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50" title="Isi otomatis config default">Gunakan Config Default</button>
+                <button id="cloudClearConfigBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50" title="Kosongkan field config">Clear</button>
+                <button id="cloudPullBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Pull</button>
+                <button id="cloudPushBtn" class="rounded-xl border px-3 py-2 text-sm font-semibold hover:bg-slate-50">Push</button>
+              </div>
+            </div>
+
+            <div id="cloudErrorWrap" class="hidden mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-900">
+              <div class="font-extrabold">Cloud Error / Troubleshooting</div>
+              <div id="cloudErrorText" class="mt-1 font-mono break-all"></div>
+              <div id="cloudErrorHints" class="mt-2 text-rose-900"></div>
+            </div>
+
+            <div class="mt-2 text-xs text-slate-500">Tips: Jika awal setup di beberapa gadget, lakukan <b>Push</b> dari gadget yang datanya paling benar, lalu <b>Pull</b> di gadget lain.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Modal (Login/Register) -->
+  <div id="authModal" class="fixed inset-0 z-[80] hidden">
+    <div class="absolute inset-0 bg-black/40" data-close="authModal"></div>
     <div class="absolute left-1/2 top-1/2 w-[95vw] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white shadow-2xl border fade-in">
       <div class="flex items-center justify-between p-4 border-b">
+        <div>
+          <div class="text-base font-extrabold">Akun</div>
+          <div class="text-xs text-slate-500">Masuk atau daftar. Role menentukan akses menu.</div>
+        </div>
+        <button class="rounded-lg p-2 hover:bg-slate-100" data-close="authModal" aria-label="Tutup">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-4">
+        <div class="flex items-center gap-2 rounded-xl border bg-slate-50 p-2">
+          <button id="authTabLogin" class="flex-1 rounded-lg px-3 py-2 text-sm font-extrabold bg-white border">Login</button>
+          <button id="authTabRegister" class="flex-1 rounded-lg px-3 py-2 text-sm font-extrabold hover:bg-white/60">Registrasi</button>
+        </div>
+
+        <!-- Login -->
+        <form id="loginForm" class="mt-4 space-y-3">
+          <div>
+            <label class="text-xs text-slate-500">Email</label>
+            <input id="loginEmail" type="email" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="nama@email.com" required />
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">Password</label>
+            <input id="loginPassword" type="password" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="••••••••" required />
+          </div>
+          <div class="rounded-xl border bg-amber-50 p-3 text-xs text-amber-900">
+            <div class="font-extrabold">Catatan</div>
+            <div class="mt-1">Ini login sederhana berbasis <b>localStorage</b> (untuk demo). Untuk produksi, gunakan Auth server/Firebase Auth.</div>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50" data-close="authModal">Batal</button>
+            <button type="submit" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800">Login</button>
+          </div>
+        </form>
+
+        <!-- Register -->
+        <form id="registerForm" class="mt-4 space-y-3 hidden">
+          <div>
+            <label class="text-xs text-slate-500">Nama</label>
+            <input id="regName" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="Nama lengkap" required />
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">Email</label>
+            <input id="regEmail" type="email" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="nama@email.com" required />
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">Nomor WhatsApp</label>
+            <input id="regWhatsApp" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm font-mono" placeholder="cth: 0812xxxx atau +62812xxxx" />
+            <div class="mt-1 text-xs text-slate-500">Wajib untuk Customer (agar otomatis terisi saat Checkout).</div>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">Password</label>
+            <input id="regPassword" type="password" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" placeholder="Min 6 karakter" minlength="6" required />
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">Role</label>
+            <select id="regRole" class="mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm">
+              <option value="customer" selected>Customer</option>
+              <option value="admin">Admin</option>
+            </select>
+            <div class="mt-1 text-xs text-slate-500">Customer hanya bisa Marketplace & Keranjang. Admin bisa akses semua menu.</div>
+          </div>
+
+          <!-- Admin reference code (required for Admin role) -->
+          <div id="adminRefWrap" class="hidden">
+            <label class="text-xs text-slate-500">Kode Referensi (khusus Admin)</label>
+            <input id="regAdminCode" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm font-mono" placeholder="Masukkan kode referensi admin" />
+            <div class="mt-1 text-xs text-slate-500">Kode diberikan oleh pemilik toko. Tanpa kode yang benar, akun Admin tidak bisa dibuat.</div>
+          </div>
+
+          <div class="rounded-xl border bg-rose-50 p-3 text-xs text-rose-900">
+            <div class="font-extrabold">Penting</div>
+            <div class="mt-1">Role admin di sini hanya pembatasan UI. Untuk keamanan produksi, role harus divalidasi di server.</div>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50" data-close="authModal">Batal</button>
+            <button type="submit" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Buat Akun</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="fixed inset-0 z-[80] hidden">
+    <div class="absolute inset-0 bg-black/40" data-close="checkoutModal"></div>
+    <div class="absolute left-1/2 top-1/2 w-[95vw] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white shadow-2xl border fade-in max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between p-4 border-b shrink-0">
         <div>
           <div class="text-base font-extrabold">Checkout</div>
           <div class="text-xs text-slate-500">Masukkan data pembeli lalu konfirmasi pembayaran</div>
@@ -1058,29 +1341,83 @@ service firebase.storage {
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
-      <form id="checkoutForm" class="p-4 space-y-3">
+      <form id="checkoutForm" class="p-4 space-y-3 flex-1 min-h-0 overflow-y-auto">
         <div>
           <label class="text-xs text-slate-500">Nama Pembeli</label>
           <input id="buyerName" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" required placeholder="cth: Varsha" />
         </div>
         <div>
+          <label class="text-xs text-slate-500">Nomor WhatsApp</label>
+          <input id="buyerWhatsApp" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm font-mono" required placeholder="cth: 0812xxxx atau +62812xxxx" />
+          <div class="mt-1 text-xs text-slate-500">Nomor ini dipakai untuk identitas pembeli dan konfirmasi.</div>
+        </div>
+        <div>
           <label class="text-xs text-slate-500">Alamat</label>
           <textarea id="buyerAddress" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" rows="3" required placeholder="Alamat lengkap..."></textarea>
+        </div>
+        <div>
+          <label class="text-xs text-slate-500">Catatan (opsional)</label>
+          <textarea id="buyerNote" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm" rows="2" placeholder="Catatan untuk admin (mis: patokan rumah, minta buah matang, jam kirim, dll)..."></textarea>
         </div>
         <div class="rounded-xl border bg-slate-50 p-3">
           <div class="flex items-center justify-between">
             <div class="text-sm text-slate-600">Total Bayar</div>
             <div id="checkoutTotal" class="text-lg font-extrabold">Rp0</div>
           </div>
-          <div class="mt-1 text-xs text-slate-500">Simulasi: pembayaran dianggap sukses, transaksi dicatat.</div>
+          <div class="mt-1 text-xs text-slate-500 italic">Harap menunggu konfirmasi Admin untuk pembayaran</div>
         </div>
         <div class="flex justify-end gap-2 pt-2">
           <button type="button" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50" data-close="checkoutModal">Batal</button>
-          <button type="submit" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Konfirmasi</button>
+          <button type="submit" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Order</button>
         </div>
       </form>
     </div>
   </div>
+
+  <!-- Order Success Modal -->
+  <div id="orderSuccessModal" class="fixed inset-0 z-[90] hidden">
+    <div class="absolute inset-0 bg-black/40" data-close="orderSuccessModal"></div>
+    <div class="absolute left-1/2 top-1/2 w-[92vw] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white shadow-2xl border fade-in">
+      <div class="p-5 text-center">
+        <div class="mx-auto h-12 w-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <div class="mt-3 text-lg font-extrabold tracking-wide">ORDER TERKIRIM</div>
+        <div id="orderSuccessSub" class="mt-1 text-xs text-slate-500">-</div>
+        <div class="mt-5">
+          <button class="w-full rounded-xl bg-slate-900 px-4 py-2 text-sm font-extrabold text-white hover:bg-slate-800" data-close="orderSuccessModal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Footer Nav (fixed bottom, only for ADMIN role) -->
+  <footer id="adminFooter" class="admin-only hidden fixed bottom-0 inset-x-0 w-full z-[55] border-t bg-white/90 glass">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2">
+      <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+        <button data-route="admin.dashboard" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Dashboard</button>
+        <button data-route="admin.products" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Produk</button>
+        <button data-route="admin.purchases" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Pembelian</button>
+        <button data-route="admin.promos" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Promo</button>
+        <button data-route="admin.shipping" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Pengiriman</button>
+        <button data-route="admin.transactions" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Transaksi</button>
+        <button data-route="admin.reports" class="route-btn rounded-xl border bg-white px-2 py-2 text-xs font-extrabold hover:bg-slate-50">Laporan</button>
+      </div>
+      <div class="mt-2 text-[11px] text-slate-500">Menu admin ada di footer agar navigasi konsisten di mobile & desktop.</div>
+    </div>
+  </footer>
+
+  <!-- Customer Footer (fixed bottom, only for CUSTOMER role) -->
+  <footer id="customerFooter" class="hidden fixed bottom-0 inset-x-0 w-full z-[55] border-t bg-white/90 glass">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
+      <div class="rounded-2xl border bg-white/95 p-3 flex items-center justify-between gap-3">
+        <div class="text-xs text-slate-600">Anda masuk sebagai <span class="font-semibold">Customer</span></div>
+        <div class="flex items-center gap-2">
+          <button id="logoutBtnCustomer" class="rounded-xl border px-4 py-2 text-sm font-semibold hover:bg-slate-50">Keluar</button>
+        </div>
+      </div>
+    </div>
+  </footer>
 
   <!-- Toast -->
   <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] hidden">
@@ -1116,6 +1453,53 @@ service firebase.storage {
       el.classList.remove('hidden');
       clearTimeout(toast._t);
       toast._t = setTimeout(() => el.classList.add('hidden'), 2200);
+    }
+
+    /**********************
+     * WhatsApp helper (Checkout -> Kirim WA)
+     **********************/
+    function normalizePhoneToDigits(s) {
+      return String(s || '').replace(/[^0-9]/g, '');
+    }
+
+    function toWhatsAppMsisdn(input) {
+      // Accept: 08xxx / +62xxx / 62xxx
+      let d = normalizePhoneToDigits(input);
+      if (!d) return '';
+      if (d.startsWith('0')) d = '62' + d.slice(1);
+      if (!d.startsWith('62')) {
+        // assume already includes country code or user typed other
+        // keep as is
+      }
+      return d;
+    }
+
+    function buildWhatsAppOrderMessage({ tx, buyerName, buyerWhatsApp, buyerAddress, buyerNote, items, total }) {
+      const lines = [];
+      lines.push(`Order Baru - Varsha Fruits and Goods`);
+      if (tx?.id) lines.push(`ID: ${tx.id}`);
+      lines.push(`Nama: ${buyerName}`);
+      if (buyerWhatsApp) lines.push(`WA: ${buyerWhatsApp}`);
+      lines.push(`Alamat: ${buyerAddress}`);
+      if (buyerNote) lines.push(`Catatan: ${buyerNote}`);
+      lines.push('');
+      lines.push('Item:');
+      for (const it of items) {
+        lines.push(`- ${it.name} x${it.qty} @ ${rupiah(it.unitPrice)} = ${rupiah(it.revenue)}`);
+      }
+      lines.push('');
+      lines.push(`Total: ${rupiah(total)}`);
+      lines.push('');
+      lines.push(`Mohon konfirmasi pembayaran. Terima kasih.`);
+      return lines.join('\n');
+    }
+
+    function openWhatsAppChat({ phone, message }) {
+      const msisdn = toWhatsAppMsisdn(phone);
+      if (!msisdn) throw new Error('Nomor WhatsApp admin belum diisi.');
+      const url = `https://wa.me/${msisdn}?text=${encodeURIComponent(message || '')}`;
+      window.open(url, '_blank', 'noopener');
+      return url;
     }
 
     function downloadText(filename, text, mime='text/csv;charset=utf-8') {
@@ -1159,7 +1543,10 @@ service firebase.storage {
       deviceId: 'varsha_device_id',
       lastSeenTxId: 'varsha_last_seen_tx_id',
       orderWebhookUrl: 'varsha_order_webhook_url',
-      orderWebhookEnabled: 'varsha_order_webhook_enabled'
+      orderWebhookEnabled: 'varsha_order_webhook_enabled',
+      adminWhatsApp: 'varsha_admin_whatsapp',
+      users: 'varsha_users',
+      session: 'varsha_session'
     };
 
     function load(key, fallback) {
@@ -1250,9 +1637,188 @@ service firebase.storage {
       stockLowOnly: false,
       txSearch: '',
       txRange: { from: '', to: '' },
+      shipSearch: '',
+      shipStatus: '',
       dashboardRange: { from: '', to: '' },
       charts: { line: null, donut: null }
     };
+
+    /**********************
+     * Auth (Local) - Admin/Customer
+     **********************/
+    function simpleHash(s) {
+      const str = String(s || '');
+      let h = 2166136261;
+      for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return (h >>> 0).toString(16);
+    }
+
+    function getUsers() { return load(LS.users, []); }
+    function setUsers(users) { save(LS.users, users); }
+
+    function getSession() {
+      const s = load(LS.session, null);
+      return s && typeof s === 'object' ? s : null;
+    }
+
+    function setSession(sess) {
+      save(LS.session, sess);
+    }
+
+    function clearSession() {
+      localStorage.removeItem(LS.session);
+    }
+
+    function currentUser() {
+      const sess = getSession();
+      if (!sess?.email) return null;
+      const u = getUsers().find(x => String(x.email).toLowerCase() === String(sess.email).toLowerCase());
+      if (!u) return null;
+      return { name: u.name, email: u.email, role: u.role, whatsApp: u.whatsApp || '' };
+    }
+
+    function isAdmin() {
+      return (currentUser()?.role || '') === 'admin';
+    }
+
+    function ensureDefaultAccounts() {
+      const users = getUsers();
+      if (!users.length) {
+        users.push({
+          id: uid('USR'),
+          name: 'Admin Varsha',
+          email: 'admin@varsha.local',
+          passwordHash: simpleHash('admin123'),
+          role: 'admin',
+          createdAt: new Date().toISOString()
+        });
+        users.push({
+          id: uid('USR'),
+          name: 'Customer Demo',
+          email: 'customer@varsha.local',
+          whatsApp: '081234567890',
+          passwordHash: simpleHash('customer123'),
+          role: 'customer',
+          createdAt: new Date().toISOString()
+        });
+        setUsers(users);
+      }
+    }
+
+    function authRegister({ name, email, password, role, adminCode, whatsApp }) {
+      const e = String(email || '').trim().toLowerCase();
+      const n = String(name || '').trim();
+      const p = String(password || '');
+      const r = (role === 'admin') ? 'admin' : 'customer';
+      const wa = String(whatsApp || '').trim();
+
+      if (r === 'admin') {
+        const code = String(adminCode || '').trim();
+        // Admin reference code is not stored in plain text. We compare a hash instead.
+        // simpleHash('FR290707WF') => 'e12d51b1'
+        const ADMIN_REF_HASH = 'e12d51b1';
+        if (simpleHash(code) !== ADMIN_REF_HASH) throw new Error('Kode referensi admin tidak valid.');
+      }
+
+      if (r !== 'admin') {
+        if (!wa) throw new Error('Nomor WhatsApp wajib diisi untuk Customer.');
+      }
+
+      if (!n) throw new Error('Nama wajib diisi.');
+      if (!e) throw new Error('Email wajib diisi.');
+      if (p.length < 6) throw new Error('Password minimal 6 karakter.');
+      const users = getUsers();
+      if (users.some(u => String(u.email).toLowerCase() === e)) throw new Error('Email sudah terdaftar.');
+      users.push({ id: uid('USR'), name: n, email: e, whatsApp: wa, passwordHash: simpleHash(p), role: r, createdAt: new Date().toISOString() });
+      setUsers(users);
+      setSession({ email: e, loggedInAt: new Date().toISOString() });
+      return { email: e, role: r };
+    }
+
+    function authLogin({ email, password }) {
+      const e = String(email || '').trim().toLowerCase();
+      const p = String(password || '');
+      const users = getUsers();
+      const u = users.find(x => String(x.email).toLowerCase() === e);
+      if (!u) throw new Error('Akun tidak ditemukan.');
+      if (u.passwordHash !== simpleHash(p)) throw new Error('Password salah.');
+      setSession({ email: e, loggedInAt: new Date().toISOString() });
+      return { email: e, role: u.role };
+    }
+
+    function authLogout() {
+      clearSession();
+    }
+
+    function applyRoleUI() {
+      const u = currentUser();
+      const isA = (u?.role === 'admin');
+      // Treat any logged-in non-admin as customer (more robust)
+      const isC = !!u && !isA;
+
+      // Admin-only controls
+      document.querySelectorAll('.admin-only').forEach(el => {
+        el.classList.toggle('hidden', !isA);
+      });
+
+      // Auth buttons
+      const openAuthBtn = document.getElementById('openAuthBtn');
+      const userNav = document.getElementById('userNav');
+      const userChip = document.getElementById('userChip');
+      const nameEl = document.getElementById('userNameLabel');
+      const roleEl = document.getElementById('userRoleLabel');
+
+
+      // Footers (bottom)
+      const adminFooter = document.getElementById('adminFooter');
+      const custFooter = document.getElementById('customerFooter');
+      const topLogoutBtn = document.getElementById('logoutBtn');
+
+      if (!u) {
+        if (openAuthBtn) openAuthBtn.classList.remove('hidden');
+        if (userNav) userNav.classList.add('hidden');
+        if (custFooter) custFooter.classList.add('hidden');
+        if (adminFooter) adminFooter.classList.add('hidden');
+
+      } else {
+        if (openAuthBtn) openAuthBtn.classList.add('hidden');
+
+        if (isA) {
+          // ADMIN: show user chip + logout in header + show admin footer menu
+          if (userNav) userNav.classList.remove('hidden');
+          if (userChip) userChip.classList.remove('hidden');
+          if (topLogoutBtn) topLogoutBtn.classList.remove('hidden');
+          if (custFooter) custFooter.classList.add('hidden');
+          if (adminFooter) adminFooter.classList.remove('hidden');
+
+        } else {
+          // CUSTOMER (or any non-admin): hide header userNav and show footer logout
+          if (userNav) userNav.classList.add('hidden');
+          if (topLogoutBtn) topLogoutBtn.classList.add('hidden');
+          if (custFooter) custFooter.classList.remove('hidden');
+          if (adminFooter) adminFooter.classList.add('hidden');
+
+        }
+
+        if (nameEl) nameEl.textContent = u.name || u.email;
+        if (roleEl) {
+          roleEl.textContent = String(u.role || 'customer').toUpperCase();
+          roleEl.className = 'rounded-full px-2 py-0.5 text-[10px] font-extrabold text-white ' + (isA ? 'bg-slate-900' : 'bg-emerald-700');
+        }
+      }
+
+      // Layout: add bottom padding when any fixed footer is visible
+      const footerVisible = (!!u && (isA || isC));
+      document.body.classList.toggle('pb-24', footerVisible);
+
+      // hard guard: customer cannot stay in admin route
+      if (!isA && String(state.route || '').startsWith('admin.')) {
+        routeTo('market');
+      }
+    }
 
     function ensureData() {
       let products = load(LS.products, null);
@@ -1314,21 +1880,36 @@ service firebase.storage {
       'admin.products': 'view-admin-products',
       'admin.purchases': 'view-admin-purchases',
       'admin.promos': 'view-admin-promos',
+      'admin.shipping': 'view-admin-shipping',
       'admin.transactions': 'view-admin-transactions',
       'admin.reports': 'view-admin-reports'
     };
 
     function routeTo(route) {
+      // guard: non-admin cannot access admin routes
+      if (String(route || '').startsWith('admin.') && !isAdmin()) {
+        toast('Akses ditolak. Menu admin khusus admin.');
+        route = 'market';
+      }
+
       state.route = route;
+
+      // Toggle admin layout wrapper
+      const adminLayout = document.getElementById('adminLayout');
+      if (adminLayout) {
+        adminLayout.classList.toggle('hidden', !String(route || '').startsWith('admin.'));
+      }
+
       for (const [k, id] of Object.entries(views)) {
         document.getElementById(id).classList.toggle('hidden', k !== route);
       }
       document.querySelectorAll('.route-btn').forEach(btn => {
-        btn.classList.toggle('bg-slate-900', btn.dataset.route === route);
-        btn.classList.toggle('text-white', btn.dataset.route === route);
-        btn.classList.toggle('hover:bg-slate-800', btn.dataset.route === route);
+        btn.classList.toggle('active-route', btn.dataset.route === route);
       });
       document.getElementById('mobileNav').classList.add('hidden');
+
+      // keep UI in sync with role
+      try { applyRoleUI(); } catch {}
 
       // Auto-pull when entering admin views (per request)
       if (String(route || '').startsWith('admin.')) {
@@ -1341,6 +1922,7 @@ service firebase.storage {
       if (route === 'admin.products') renderAdminProducts();
       if (route === 'admin.purchases') renderPurchases();
       if (route === 'admin.promos') renderPromos();
+      if (route === 'admin.shipping') renderShipping();
       if (route === 'admin.transactions') renderTransactions();
       if (route === 'admin.reports') renderReports();
     }
@@ -1632,91 +2214,139 @@ service firebase.storage {
       // (Works if Firebase config + Shop ID already saved)
       try { cloudEnsureConnected({ silent: true, forceConnect: true }); } catch {}
 
+      // Autofill from logged-in user (if customer)
+      try {
+        const u = currentUser();
+        const nameEl = document.getElementById('buyerName');
+        const waEl = document.getElementById('buyerWhatsApp');
+        if (u) {
+          if (nameEl && !nameEl.value) nameEl.value = u.name || '';
+          if (waEl && !waEl.value) waEl.value = u.whatsApp || '';
+        }
+      } catch {}
+
       document.getElementById('checkoutModal').classList.remove('hidden');
-      document.getElementById('buyerName').focus();
+      // focus to address so customer tinggal isi alamat
+      document.getElementById('buyerAddress').focus();
     }
 
     function closeModal(id) {
       document.getElementById(id).classList.add('hidden');
     }
 
-    function doCheckout({ name, address }) {
+    function showOrderSuccess(tx) {
+      const m = document.getElementById('orderSuccessModal');
+      const sub = document.getElementById('orderSuccessSub');
+      if (sub) {
+        const id = tx?.id ? `ID: ${tx.id}` : '';
+        const total = (tx?.total !== undefined) ? `Total: ${rupiah(tx.total)}` : '';
+        sub.textContent = [id, total].filter(Boolean).join(' • ') || 'Order berhasil dikirim.';
+      }
+      if (m) m.classList.remove('hidden');
+    }
+
+    async function doCheckout({ name, address, note = '', whatsApp = '', txIdOverride = '' } = {}) {
       const items = cartDetailed();
-      if (items.length === 0) return;
+      if (items.length === 0) return null;
 
-      // For multi-device consistency: pull -> validate -> write -> push
-      cloudSyncWrite(() => {
-        const products = getProducts();
+      try {
+        // For multi-device consistency: pull -> validate -> write -> push
+        const tx = await cloudSyncWrite(() => {
+          const products = getProducts();
 
-        // validate stock against latest local (which is already pulled)
-        for (const it of items) {
-          const p = products.find(x => x.id === it.productId);
-          if (!p || p.stock < it.qty) {
-            toast('Stok berubah. Silakan cek keranjang.');
-            renderCart();
-            renderMarketplace();
-            throw new Error('stock_changed');
+          // validate stock against latest local (which is already pulled)
+          for (const it of items) {
+            const p = products.find(x => x.id === it.productId);
+            if (!p || p.stock < it.qty) {
+              toast('Stok berubah. Silakan cek keranjang.');
+              renderCart();
+              renderMarketplace();
+              throw new Error('stock_changed');
+            }
           }
-        }
 
-        // compute totals
-        let total = 0;
-        let profit = 0;
-        const txItems = items.map(it => {
-          const revenue = it.qty * it.priceUnit;
-          const cost = it.qty * Number(it.priceBuy || 0);
-          total += revenue;
-          profit += (revenue - cost);
-          return {
-            productId: it.productId,
-            name: it.name,
-            qty: it.qty,
-            unitPrice: it.priceUnit,
-            discountPct: it.promoOn ? it.discountPct : 0,
-            unitSellBase: it.priceSellBase,
-            unitBuy: it.priceBuy,
-            revenue,
-            cost
+          // compute totals
+          let total = 0;
+          let profit = 0;
+          const txItems = items.map(it => {
+            const revenue = it.qty * it.priceUnit;
+            const cost = it.qty * Number(it.priceBuy || 0);
+            total += revenue;
+            profit += (revenue - cost);
+            return {
+              productId: it.productId,
+              name: it.name,
+              qty: it.qty,
+              unitPrice: it.priceUnit,
+              discountPct: it.promoOn ? it.discountPct : 0,
+              unitSellBase: it.priceSellBase,
+              unitBuy: it.priceBuy,
+              revenue,
+              cost
+            };
+          });
+
+          // update stock
+          for (const it of items) {
+            const p = products.find(x => x.id === it.productId);
+            p.stock = Math.max(0, Number(p.stock || 0) - it.qty);
+          }
+          setProducts(products);
+
+          // record transaction
+          const tx = {
+            id: txIdOverride || uid('TX'),
+            date: new Date().toISOString(),
+            buyerName: name,
+            buyerWhatsApp: whatsApp || '',
+            buyerAddress: address,
+            buyerNote: note || '',
+            total,
+            profit,
+            items: txItems,
+            shipping: {
+              status: 'pending',
+              updatedAt: new Date().toISOString(),
+              updatedBy: 'system',
+              fee: 0,
+              billConfirmedAt: '',
+              billConfirmedBy: ''
+            }
           };
-        });
+          const txs = getTransactions();
+          txs.unshift(tx);
+          setTransactions(txs);
 
-        // update stock
-        for (const it of items) {
-          const p = products.find(x => x.id === it.productId);
-          p.stock = Math.max(0, Number(p.stock || 0) - it.qty);
-        }
-        setProducts(products);
+          // clear cart
+          setCart([]);
 
-        // record transaction
-        const tx = {
-          id: uid('TX'),
-          date: new Date().toISOString(),
-          buyerName: name,
-          buyerAddress: address,
-          total,
-          profit,
-          items: txItems
-        };
-        const txs = getTransactions();
-        txs.unshift(tx);
-        setTransactions(txs);
+          return tx;
+        }, { reason: 'checkout' });
 
-        // clear cart
-        setCart([]);
+        if (!tx) return null;
 
         toast('Checkout sukses! Transaksi tercatat.');
 
         // Alternative to Firebase: send order webhook (non-blocking)
         try { sendOrderWebhook(tx); } catch {}
 
+        // reset checkout note field (optional)
+        try { const nEl = document.getElementById('buyerNote'); if (nEl) nEl.value = ''; } catch {}
+
         closeModal('checkoutModal');
         closeCart();
         rerenderAll();
-        routeTo('admin.dashboard');
-      }, { reason: 'checkout' }).catch((e) => {
-        if (String(e?.message || '') === 'stock_changed') return;
+        routeTo(isAdmin() ? 'admin.dashboard' : 'market');
+
+        // Show success box
+        try { showOrderSuccess(tx); } catch {}
+
+        return tx;
+      } catch (e) {
+        if (String(e?.message || '') === 'stock_changed') return null;
         console.warn(e);
-      });
+        return null;
+      }
     }
 
     /**********************
@@ -2277,6 +2907,288 @@ service firebase.storage {
     }
 
     /**********************
+     * Shipping admin
+     **********************/
+    const SHIPPING_STATUSES = [
+      { value: 'pending', label: 'Pending', cls: 'bg-slate-100 text-slate-700' },
+      { value: 'processing', label: 'Diproses', cls: 'bg-amber-100 text-amber-800' },
+      { value: 'shipped', label: 'Dikirim', cls: 'bg-sky-100 text-sky-800' },
+      { value: 'delivered', label: 'Selesai', cls: 'bg-emerald-100 text-emerald-800' },
+      { value: 'canceled', label: 'Batal', cls: 'bg-rose-100 text-rose-800' }
+    ];
+
+    function getShippingMeta(status) {
+      const s = String(status || 'pending');
+      return SHIPPING_STATUSES.find(x => x.value === s) || SHIPPING_STATUSES[0];
+    }
+
+    function normalizeTxShipping(tx) {
+      if (!tx) return tx;
+      if (!tx.shipping || typeof tx.shipping !== 'object') {
+        tx.shipping = { status: 'pending', updatedAt: '', updatedBy: '', fee: 0, billConfirmedAt: '', billConfirmedBy: '' };
+      }
+      if (!tx.shipping.status) tx.shipping.status = 'pending';
+      if (tx.shipping.fee === undefined || tx.shipping.fee === null || isNaN(Number(tx.shipping.fee))) tx.shipping.fee = 0;
+      if (!tx.shipping.billConfirmedAt) tx.shipping.billConfirmedAt = '';
+      if (!tx.shipping.billConfirmedBy) tx.shipping.billConfirmedBy = '';
+      return tx;
+    }
+
+    function getTxBillTotal(tx) {
+      const base = Number(tx?.total || 0);
+      const fee = Number(tx?.shipping?.fee || 0);
+      return base + fee;
+    }
+
+    function setShippingStatusAndFee(txId, { status, fee }) {
+      return cloudSyncWrite(() => {
+        const txs = getTransactions();
+        const tx = txs.find(t => t.id === txId);
+        if (!tx) return;
+        normalizeTxShipping(tx);
+        if (status !== undefined) tx.shipping.status = String(status || 'pending');
+        if (fee !== undefined) tx.shipping.fee = Math.max(0, Number(fee || 0));
+        tx.shipping.updatedAt = new Date().toISOString();
+        tx.shipping.updatedBy = currentUser()?.email || 'local';
+        setTransactions(txs);
+        toast('Pengiriman diperbarui.');
+        rerenderAll();
+        routeTo('admin.shipping');
+      }, { reason: 'shippingUpdate' });
+    }
+
+    function buildWhatsAppBillMessage({ tx, shippingFee }) {
+      const fee = Math.max(0, Number(shippingFee || 0));
+      const totalItems = Number(tx?.total || 0);
+      const bill = totalItems + fee;
+      const items = Array.isArray(tx?.items) ? tx.items : [];
+
+      const lines = [];
+      lines.push(`Konfirmasi Tagihan - Varsha Fruits and Goods`);
+      if (tx?.id) lines.push(`ID: ${tx.id}`);
+      if (tx?.buyerName) lines.push(`Nama: ${tx.buyerName}`);
+      if (tx?.buyerWhatsApp) lines.push(`WA: ${tx.buyerWhatsApp}`);
+      if (tx?.buyerAddress) lines.push(`Alamat: ${tx.buyerAddress}`);
+      if (tx?.buyerNote) lines.push(`Catatan: ${tx.buyerNote}`);
+      lines.push('');
+
+      if (items.length) {
+        lines.push('Rincian Item:');
+        for (const it of items) {
+          const qty = Number(it.qty || 0);
+          const unit = Number(it.unitPrice || 0);
+          const subtotal = Number(it.revenue || (qty * unit) || 0);
+          lines.push(`- ${it.name} x${qty} @ ${rupiah(unit)} = ${rupiah(subtotal)}`);
+        }
+        lines.push('');
+      }
+
+      lines.push(`Subtotal belanja: ${rupiah(totalItems)}`);
+      lines.push(`Biaya pengiriman: ${rupiah(fee)}`);
+      lines.push(`Total tagihan: ${rupiah(bill)}`);
+      lines.push('');
+      lines.push('Silakan lakukan pembayaran sesuai total tagihan di atas. Terima kasih.');
+      return lines.join('\n');
+    }
+
+    async function sendBillToCustomer(txId) {
+      const txs = getTransactions();
+      const tx = txs.find(t => t.id === txId);
+      if (!tx) throw new Error('Transaksi tidak ditemukan.');
+      normalizeTxShipping(tx);
+      const wa = String(tx.buyerWhatsApp || '').trim();
+      if (!wa) throw new Error('Nomor WhatsApp customer belum ada di transaksi.');
+
+      const msisdn = toWhatsAppMsisdn(wa);
+      if (!msisdn) throw new Error('Nomor WhatsApp customer tidak valid.');
+
+      // Build final message first (so the opened WA always contains full details)
+      const msg = buildWhatsAppBillMessage({ tx, shippingFee: tx.shipping.fee });
+      const finalUrl = `https://wa.me/${msisdn}?text=${encodeURIComponent(msg)}`;
+
+      // Open WA immediately (avoid popup blocker)
+      let win = null;
+      try { win = window.open(finalUrl, '_blank', 'noopener'); } catch {}
+
+      // Record confirmation in data (and push to cloud)
+      await cloudSyncWrite(() => {
+        const txs2 = getTransactions();
+        const tx2 = txs2.find(t => t.id === txId);
+        if (!tx2) return;
+        normalizeTxShipping(tx2);
+        tx2.shipping.billConfirmedAt = new Date().toISOString();
+        tx2.shipping.billConfirmedBy = currentUser()?.email || 'local';
+        setTransactions(txs2);
+      }, { reason: 'billConfirm' });
+
+      // Fallback if popup blocked
+      try {
+        if (!win) window.open(finalUrl, '_blank', 'noopener');
+      } catch {}
+
+      toast('Konfirmasi tagihan dikirim (WA).');
+      rerenderAll();
+      routeTo('admin.shipping');
+    }
+
+    function filterShippingList(txs) {
+      const q = String(state.shipSearch || '').trim().toLowerCase();
+      const st = String(state.shipStatus || '').trim();
+      let list = txs.slice();
+      for (const tx of list) normalizeTxShipping(tx);
+      if (st) list = list.filter(tx => (tx.shipping?.status || 'pending') === st);
+      if (q) {
+        list = list.filter(tx => {
+          const hay = [
+            tx.id,
+            tx.buyerName,
+            tx.buyerWhatsApp,
+            tx.buyerAddress,
+            tx.buyerNote
+          ].filter(Boolean).join(' ').toLowerCase();
+          return hay.includes(q);
+        });
+      }
+      return list;
+    }
+
+    function renderShipping() {
+      const txs = getTransactions();
+      const list = filterShippingList(txs);
+
+      const body = document.getElementById('shipBody');
+      const empty = document.getElementById('shipEmpty');
+      if (!body || !empty) return;
+
+      body.innerHTML = '';
+      empty.classList.toggle('hidden', list.length !== 0);
+
+      if (list.length === 0 && txs.length > 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="py-6 text-center text-slate-500" colspan="9">Tidak ada order yang cocok dengan filter.</td>`;
+        body.appendChild(tr);
+        return;
+      }
+
+      for (const tx of list) {
+        normalizeTxShipping(tx);
+        const meta = getShippingMeta(tx.shipping?.status);
+        const updatedText = tx.shipping?.updatedAt ? ` • ${new Date(tx.shipping.updatedAt).toLocaleString('id-ID')}` : '';
+
+        const fee = Number(tx.shipping?.fee || 0);
+        const bill = getTxBillTotal(tx);
+        const billConfirmedAt = tx.shipping?.billConfirmedAt ? new Date(tx.shipping.billConfirmedAt).toLocaleString('id-ID') : '';
+
+        const tr = document.createElement('tr');
+        tr.className = 'border-b last:border-b-0 align-top';
+        tr.innerHTML = `
+          <td class="py-3 font-semibold whitespace-nowrap">${tx.id}</td>
+          <td class="py-3 whitespace-nowrap">${new Date(tx.date).toLocaleString('id-ID')}</td>
+          <td class="py-3">
+            <div class="font-semibold">${tx.buyerName || '-'}</div>
+            ${tx.buyerWhatsApp ? `<div class="text-xs text-slate-600 font-mono">${tx.buyerWhatsApp}</div>` : ''}
+            ${tx.buyerNote ? `<div class="mt-1 text-xs text-slate-500 italic">Catatan: ${tx.buyerNote}</div>` : ''}
+          </td>
+          <td class="py-3">
+            <div class="text-xs text-slate-600 max-w-[420px]">${tx.buyerAddress || ''}</div>
+          </td>
+          <td class="py-3 whitespace-nowrap">${rupiah(tx.total || 0)}</td>
+          <td class="py-3 whitespace-nowrap">
+            <input type="number" min="0" step="100" class="ship-fee no-spin w-28 rounded-xl border bg-white px-2 py-1.5 text-xs" data-id="${tx.id}" value="${fee}" />
+            <div class="mt-1 text-[11px] text-slate-500">Rp (manual)</div>
+          </td>
+          <td class="py-3 whitespace-nowrap">
+            <div class="font-extrabold">${rupiah(bill)}</div>
+            ${billConfirmedAt ? `<div class="mt-1 text-[11px] text-emerald-700 font-semibold">WA terkirim: ${billConfirmedAt}</div>` : `<div class="mt-1 text-[11px] text-slate-500">Belum konfirmasi</div>`}
+          </td>
+          <td class="py-3">
+            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-bold ${meta.cls}">${meta.label}</span>
+            <div class="mt-1 text-[11px] text-slate-500">Update${updatedText}</div>
+          </td>
+          <td class="py-3 text-right">
+            <div class="inline-flex flex-col items-end gap-2">
+              <div class="inline-flex flex-col sm:flex-row gap-2">
+                <select class="ship-set rounded-xl border bg-white px-2 py-1.5 text-xs" data-id="${tx.id}">
+                  ${SHIPPING_STATUSES.map(s => `<option value="${s.value}" ${s.value === (tx.shipping?.status || 'pending') ? 'selected' : ''}>${s.label}</option>`).join('')}
+                </select>
+                <button class="ship-save rounded-xl bg-slate-900 px-3 py-1.5 text-xs font-extrabold text-white hover:bg-slate-800" data-id="${tx.id}">Simpan</button>
+              </div>
+              <button class="ship-bill rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-extrabold text-emerald-800 hover:bg-emerald-100" data-id="${tx.id}">Kirim Tagihan</button>
+            </div>
+          </td>
+        `;
+        body.appendChild(tr);
+      }
+
+      body.querySelectorAll('.ship-save').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const sel = body.querySelector(`.ship-set[data-id="${id}"]`);
+          const feeEl = body.querySelector(`.ship-fee[data-id="${id}"]`);
+          const status = sel?.value || 'pending';
+          const fee = Number(feeEl?.value || 0);
+          try {
+            btn.disabled = true;
+            btn.classList.add('opacity-60');
+            await setShippingStatusAndFee(id, { status, fee });
+          } catch (e) {
+            console.warn(e);
+          } finally {
+            btn.disabled = false;
+            btn.classList.remove('opacity-60');
+          }
+        });
+      });
+
+      body.querySelectorAll('.ship-bill').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const feeEl = body.querySelector(`.ship-fee[data-id="${id}"]`);
+          const fee = Number(feeEl?.value || 0);
+          try {
+            btn.disabled = true;
+            btn.classList.add('opacity-60');
+            // ensure fee saved before sending bill
+            await setShippingStatusAndFee(id, { fee });
+            await sendBillToCustomer(id);
+          } catch (e) {
+            console.warn(e);
+            toast(e?.message || 'Gagal kirim tagihan.');
+          } finally {
+            btn.disabled = false;
+            btn.classList.remove('opacity-60');
+          }
+        });
+      });
+    }
+
+    function exportShippingReport() {
+      const txs = getTransactions();
+      const rows = txs.map(tx => {
+        normalizeTxShipping(tx);
+        const fee = Number(tx.shipping?.fee || 0);
+        const bill = getTxBillTotal(tx);
+        return {
+          tx_id: tx.id,
+          tx_date: new Date(tx.date).toLocaleString('id-ID'),
+          buyer_name: tx.buyerName || '',
+          buyer_whatsapp: tx.buyerWhatsApp || '',
+          buyer_address: tx.buyerAddress || '',
+          total_items: tx.total || 0,
+          shipping_fee: fee,
+          bill_total: bill,
+          shipping_status: tx.shipping?.status || 'pending',
+          shipping_updated_at: tx.shipping?.updatedAt || '',
+          shipping_updated_by: tx.shipping?.updatedBy || '',
+          bill_confirmed_at: tx.shipping?.billConfirmedAt || '',
+          bill_confirmed_by: tx.shipping?.billConfirmedBy || ''
+        };
+      });
+      const csv = toCSV(rows.length ? rows : [{ note: 'Tidak ada data pengiriman.' }]);
+      downloadText(`Varsha_Laporan_Pengiriman_${toISODate(new Date())}.csv`, csv);
+    }
+
+    /**********************
      * Transactions admin
      **********************/
     function renderTransactions() {
@@ -2299,6 +3211,7 @@ service firebase.storage {
       document.getElementById('txEmpty').classList.toggle('hidden', list.length !== 0);
 
       for (const tx of list) {
+        normalizeTxShipping(tx);
         const detail = (tx.items || []).map(it => `${it.name} x${it.qty} @${rupiah(it.unitPrice)}${it.discountPct ? ` (-${it.discountPct}%)` : ''}`).join(' • ');
         const tr = document.createElement('tr');
         tr.className = 'border-b last:border-b-0';
@@ -2307,7 +3220,9 @@ service firebase.storage {
           <td class="py-3">${new Date(tx.date).toLocaleString('id-ID')}</td>
           <td class="py-3">
             <div class="font-semibold">${tx.buyerName || '-'}</div>
+            ${tx.buyerWhatsApp ? `<div class="text-xs text-slate-600 font-mono">${tx.buyerWhatsApp}</div>` : ''}
             <div class="text-xs text-slate-500 truncate max-w-[360px]">${tx.buyerAddress || ''}</div>
+            ${tx.buyerNote ? `<div class="mt-1 text-xs text-slate-500 italic truncate max-w-[360px]">Catatan: ${tx.buyerNote}</div>` : ''}
           </td>
           <td class="py-3">${rupiah(tx.total)}</td>
           <td class="py-3">${rupiah(tx.profit)}</td>
@@ -2332,12 +3247,22 @@ service firebase.storage {
       const txs = getTransactions();
       const rows = [];
       for (const tx of txs) {
+        normalizeTxShipping(tx);
+        const shippingFee = Number(tx.shipping?.fee || 0);
+        const billTotal = getTxBillTotal(tx);
+        const billConfirmedAt = tx.shipping?.billConfirmedAt || '';
+
         for (const it of (tx.items || [])) {
           rows.push({
             tx_id: tx.id,
             tx_date: new Date(tx.date).toLocaleString('id-ID'),
             buyer_name: tx.buyerName,
+            buyer_whatsapp: tx.buyerWhatsApp || '',
             buyer_address: tx.buyerAddress,
+            buyer_note: tx.buyerNote || '',
+            shipping_fee: shippingFee,
+            bill_total: billTotal,
+            bill_confirmed_at: billConfirmedAt,
             product: it.name,
             qty: it.qty,
             unit_price: it.unitPrice,
@@ -2445,19 +3370,10 @@ service firebase.storage {
     }
 
     function renderReports() {
-      // populate cloud settings UI
-      const cfg = load(LS.cloudConfig, '');
-      const shopId = load(LS.cloudShopId, '');
+      // Cloud Sync UI moved to header modal; here we only keep header status up to date
       const enabled = !!load(LS.cloudEnabled, false);
-      const cfgEl = document.getElementById('cloudConfigJson');
-      const shopEl = document.getElementById('cloudShopId');
-
-      if (cfgEl && !cfgEl.value) {
-        cfgEl.value = cfg || JSON.stringify(DEFAULT_FIREBASE_CONFIG, null, 2);
-      }
-      if (shopEl && !shopEl.value) {
-        shopEl.value = shopId || 'varsha-shop-01';
-      }
+      const hasCfg = !!String(load(LS.cloudConfig, '') || '').trim();
+      const hasShop = !!String(load(LS.cloudShopId, '') || '').trim();
 
       // populate webhook settings
       const whUrlEl = document.getElementById('orderWebhookUrl');
@@ -2467,7 +3383,7 @@ service firebase.storage {
       updateOrderWebhookStatusUI();
 
       // If already connected, keep the live status (do not overwrite to Ready)
-      if (!cloud.connected) updateCloudStatusUI(enabled ? 'Ready (saved config)' : 'Offline');
+      if (!cloud.connected) updateCloudStatusUI((enabled || (hasCfg && hasShop)) ? 'Ready (saved config)' : 'Offline');
     }
 
     /**********************
@@ -3083,14 +3999,19 @@ service firebase.storage {
       const dot = document.getElementById('cloudNavDot');
       const t = document.getElementById('cloudNavText');
       const enabled = !!load(LS.cloudEnabled, false);
-      if (nav) nav.classList.toggle('hidden', !enabled);
+      const hasCfg = !!String(load(LS.cloudConfig, '') || '').trim();
+      const hasShop = !!String(load(LS.cloudShopId, '') || '').trim();
+      // Cloud pill in header is always visible so user can open Cloud Sync settings
+      if (nav) nav.classList.remove('hidden');
 
       if (dot) {
         const online = String(text || '').toLowerCase().includes('connected');
-        dot.className = 'h-2 w-2 rounded-full ' + (online ? 'bg-emerald-500' : enabled ? 'bg-amber-400' : 'bg-slate-300');
+        dot.className = 'h-2 w-2 rounded-full ' + (online ? 'bg-emerald-500' : (enabled || (hasCfg && hasShop)) ? 'bg-amber-400' : 'bg-slate-300');
       }
       if (t) {
-        const short = enabled ? (String(text || 'Offline').startsWith('Connected') ? 'Cloud: Online' : 'Cloud: Ready') : 'Cloud: Offline';
+        const short = (enabled || (hasCfg && hasShop) || cloud.connected)
+          ? (String(text || 'Offline').startsWith('Connected') ? 'Cloud: Online' : 'Cloud: Ready')
+          : 'Cloud: Offline';
         t.textContent = short;
       }
     }
@@ -3104,6 +4025,29 @@ service firebase.storage {
       appId: "1:153003646850:web:e45ea618cdb8cdbbd1399b",
       measurementId: "G-C5CV3QZQDJ"
     };
+
+    // Ensure default Firebase config + default Shop ID exist in localStorage.
+    // This does NOT override user-entered settings.
+    function ensureCloudDefaults({ enable = false } = {}) {
+      const existingCfg = String(load(LS.cloudConfig, '') || '').trim();
+      const existingShop = String(load(LS.cloudShopId, '') || '').trim();
+
+      if (!existingCfg) {
+        save(LS.cloudConfig, JSON.stringify(DEFAULT_FIREBASE_CONFIG, null, 2));
+      }
+      if (!existingShop) {
+        // Default shop ID (must be same across devices to sync)
+        save(LS.cloudShopId, 'varsha-shop-01');
+      }
+      if (enable) {
+        save(LS.cloudEnabled, true);
+      }
+
+      return {
+        configText: String(load(LS.cloudConfig, '') || '').trim(),
+        shopId: String(load(LS.cloudShopId, '') || '').trim()
+      };
+    }
 
     function parseFirebaseConfigText(text) {
       const raw = (text || '').trim();
@@ -3193,15 +4137,17 @@ service firebase.storage {
       return true;
     }
 
-    async function cloudDisconnect() {
+    async function cloudDisconnect(opts = {}) {
+      const silent = !!opts.silent;
+      const keepEnabled = !!opts.keepEnabled;
       if (cloud.unsub) {
         try { cloud.unsub(); } catch {}
         cloud.unsub = null;
       }
       cloud.connected = false;
-      save(LS.cloudEnabled, false);
+      if (!keepEnabled) save(LS.cloudEnabled, false);
       updateCloudStatusUI('Offline');
-      toast('Cloud sync dimatikan (disconnect).');
+      if (!silent) toast('Cloud sync dimatikan (disconnect).');
     }
 
     function cloudDocRef(shopId) {
@@ -3349,6 +4295,7 @@ service firebase.storage {
       if (state.route === 'admin.products') renderAdminProducts();
       if (state.route === 'admin.purchases') renderPurchases();
       if (state.route === 'admin.promos') renderPromos();
+      if (state.route === 'admin.shipping') renderShipping();
       if (state.route === 'admin.transactions') renderTransactions();
     }
 
@@ -3360,9 +4307,14 @@ service firebase.storage {
         btn.addEventListener('click', () => routeTo(btn.dataset.route));
       });
 
-      document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-        document.getElementById('mobileNav').classList.toggle('hidden');
-      });
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => {
+          document.getElementById('mobileNav')?.classList.toggle('hidden');
+        });
+      }
+
+      // (Sidebar admin sudah dihapus; menu admin sekarang ada di footer untuk role admin)
 
       // Marketplace filters
       document.getElementById('categoryFilter').addEventListener('change', (e) => {
@@ -3389,6 +4341,219 @@ service firebase.storage {
         document.getElementById('productsAnchor').scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
 
+      // Cloud Sync modal open
+      const cloudNavStatusBtn = document.getElementById('cloudNavStatus');
+      const openCloudSyncBtnReports = document.getElementById('openCloudSyncBtnReports');
+
+      function openCloudSyncModal() {
+        const modal = document.getElementById('cloudSyncModal');
+        if (!modal) return;
+
+        // hydrate saved settings (ensure defaults exist first)
+        try { ensureCloudDefaults({ enable: false }); } catch {}
+        const shop = String(load(LS.cloudShopId, '') || '').trim();
+        const cfg = String(load(LS.cloudConfig, '') || '').trim();
+        const shopEl = document.getElementById('cloudShopId');
+        const cfgEl = document.getElementById('cloudConfigJson');
+        if (shopEl && !shopEl.value) shopEl.value = shop;
+        if (cfgEl && !cfgEl.value) cfgEl.value = cfg;
+
+        // show modal
+        modal.classList.remove('hidden');
+
+        // update status text inside modal
+        if (cloud.connected) updateCloudStatusUI(`Connected • projectId=${cloud.projectId} • shop=${cloud.shopId}`);
+        else {
+          const hasCfg = !!cfg;
+          const hasShop = !!shop;
+          updateCloudStatusUI((hasCfg && hasShop) ? 'Ready (saved config)' : 'Offline');
+        }
+      }
+
+      if (cloudNavStatusBtn && !cloudNavStatusBtn._boundOpen) {
+        cloudNavStatusBtn.addEventListener('click', openCloudSyncModal);
+        cloudNavStatusBtn._boundOpen = true;
+      }
+      if (openCloudSyncBtnReports && !openCloudSyncBtnReports._boundOpen) {
+        openCloudSyncBtnReports.addEventListener('click', openCloudSyncModal);
+        openCloudSyncBtnReports._boundOpen = true;
+      }
+
+      // Auth
+      const openAuthBtn = document.getElementById('openAuthBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const authTabLogin = document.getElementById('authTabLogin');
+      const authTabRegister = document.getElementById('authTabRegister');
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+
+      function openAuthModal(tab = 'login') {
+        document.getElementById('authModal').classList.remove('hidden');
+        setAuthTab(tab);
+        if (tab === 'login') document.getElementById('loginEmail')?.focus();
+        else document.getElementById('regName')?.focus();
+      }
+
+      function setAuthTab(tab) {
+        const isLogin = tab === 'login';
+        if (loginForm) loginForm.classList.toggle('hidden', !isLogin);
+        if (registerForm) registerForm.classList.toggle('hidden', isLogin);
+        if (authTabLogin) {
+          authTabLogin.classList.toggle('bg-white', isLogin);
+          authTabLogin.classList.toggle('border', isLogin);
+          authTabLogin.classList.toggle('hover:bg-white/60', !isLogin);
+        }
+        if (authTabRegister) {
+          authTabRegister.classList.toggle('bg-white', !isLogin);
+          authTabRegister.classList.toggle('border', !isLogin);
+          authTabRegister.classList.toggle('hover:bg-white/60', isLogin);
+        }
+      }
+
+      if (openAuthBtn) openAuthBtn.addEventListener('click', () => openAuthModal('login'));
+      if (authTabLogin) authTabLogin.addEventListener('click', () => setAuthTab('login'));
+      if (authTabRegister) authTabRegister.addEventListener('click', () => setAuthTab('register'));
+
+      const logoutBtnCustomer = document.getElementById('logoutBtnCustomer');
+
+      async function doLogout() {
+        try {
+          if (cloud?.connected) await cloudDisconnect({ silent: true });
+        } catch {}
+        authLogout();
+        toast('Berhasil keluar.');
+        applyRoleUI();
+        routeTo('market');
+      }
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', doLogout);
+      }
+      if (logoutBtnCustomer) {
+        logoutBtnCustomer.addEventListener('click', doLogout);
+      }
+
+      if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          try {
+            authLogin({
+              email: document.getElementById('loginEmail').value,
+              password: document.getElementById('loginPassword').value
+            });
+            closeModal('authModal');
+            applyRoleUI();
+
+            // Ensure default Firebase config + Shop ID exist, then auto-connect + pull
+            try {
+              ensureCloudDefaults({ enable: true });
+              updateCloudStatusUI('Connecting...');
+              const res = await cloudEnsureConnected({ silent: true, forceConnect: true });
+              if (res?.ok && res?.shopId) await cloudAutoPullIfNeeded('login');
+            } catch {}
+
+            toast('Login berhasil.');
+            // route based on role
+            routeTo(isAdmin() ? 'admin.dashboard' : 'market');
+          } catch (err) {
+            toast(err?.message || 'Login gagal.');
+          }
+        });
+      }
+
+      if (registerForm) {
+        // Toggle admin ref code field
+        const regRoleEl = document.getElementById('regRole');
+        const adminRefWrap = document.getElementById('adminRefWrap');
+        const regAdminCode = document.getElementById('regAdminCode');
+
+        function syncAdminRefVisibility() {
+          const isAdm = (regRoleEl?.value === 'admin');
+          if (adminRefWrap) adminRefWrap.classList.toggle('hidden', !isAdm);
+          if (!isAdm && regAdminCode) regAdminCode.value = '';
+
+          const waEl = document.getElementById('regWhatsApp');
+          if (waEl) {
+            // WA wajib untuk customer, opsional untuk admin
+            waEl.disabled = isAdm;
+            waEl.classList.toggle('bg-slate-100', isAdm);
+            waEl.classList.toggle('cursor-not-allowed', isAdm);
+            if (isAdm) waEl.value = '';
+          }
+        }
+
+        if (regRoleEl && !regRoleEl._boundAdminRef) {
+          regRoleEl.addEventListener('change', syncAdminRefVisibility);
+          regRoleEl._boundAdminRef = true;
+        }
+        // initial
+        syncAdminRefVisibility();
+
+        registerForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          try {
+            authRegister({
+              name: document.getElementById('regName').value,
+              email: document.getElementById('regEmail').value,
+              whatsApp: document.getElementById('regWhatsApp')?.value,
+              password: document.getElementById('regPassword').value,
+              role: document.getElementById('regRole').value,
+              adminCode: document.getElementById('regAdminCode')?.value
+            });
+            closeModal('authModal');
+            applyRoleUI();
+
+            // Ensure default Firebase config + Shop ID exist, then auto-connect + pull
+            try {
+              ensureCloudDefaults({ enable: true });
+              updateCloudStatusUI('Connecting...');
+              const res = await cloudEnsureConnected({ silent: true, forceConnect: true });
+              if (res?.ok && res?.shopId) await cloudAutoPullIfNeeded('register');
+            } catch {}
+
+            toast('Registrasi berhasil.');
+            routeTo(isAdmin() ? 'admin.dashboard' : 'market');
+          } catch (err) {
+            toast(err?.message || 'Registrasi gagal.');
+          }
+        });
+      }
+
+      // Reload (pull from cloud if available)
+      const reloadBtn = document.getElementById('reloadBtn');
+      if (reloadBtn) {
+        reloadBtn.addEventListener('click', async () => {
+          try {
+            reloadBtn.disabled = true;
+            reloadBtn.classList.add('opacity-60');
+
+            // Try connect + pull (if config exists). If cloud empty, push local baseline.
+            const res = await cloudEnsureConnected({ silent: true, forceConnect: true });
+            if (res.ok && res.shopId) {
+              const pullRes = await cloudPull(res.shopId, { silent: true, noRoute: true, noToastEmpty: true });
+              if (pullRes?.empty) {
+                await cloudPush(res.shopId, { silent: true });
+                toast('Cloud kosong. Data lokal dikirim ke Cloud.');
+              } else {
+                toast('Reload selesai (Cloud Sync).');
+              }
+              hideCloudError();
+            } else {
+              toast('Reload selesai.');
+            }
+
+            rerenderAll();
+          } catch (e) {
+            console.warn(e);
+            toast('Reload gagal. Cek Cloud Sync.');
+            showCloudError(e);
+          } finally {
+            reloadBtn.disabled = false;
+            reloadBtn.classList.remove('opacity-60');
+          }
+        });
+      }
+
       // Cart
       document.getElementById('openCartBtn').addEventListener('click', openCart);
       document.getElementById('closeCartBtn').addEventListener('click', closeCart);
@@ -3396,19 +4561,24 @@ service firebase.storage {
       document.getElementById('clearCartBtn').addEventListener('click', clearCart);
       document.getElementById('checkoutBtn').addEventListener('click', openCheckout);
 
-      // Modals close
+      // Modals close (use closest so clicking SVG inside button still closes)
       document.body.addEventListener('click', (e) => {
         const t = e.target;
-        if (t?.dataset?.close) closeModal(t.dataset.close);
+        const closer = t?.closest ? t.closest('[data-close]') : null;
+        if (closer?.dataset?.close) closeModal(closer.dataset.close);
       });
 
-      // Checkout submit
-      document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+      // Checkout submit (Order - tanpa kirim WA)
+      document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('buyerName').value.trim();
+        const whatsApp = document.getElementById('buyerWhatsApp').value.trim();
         const address = document.getElementById('buyerAddress').value.trim();
-        if (!name || !address) return;
-        doCheckout({ name, address });
+        const note = document.getElementById('buyerNote')?.value?.trim() || '';
+        if (!name || !whatsApp || !address) return;
+
+        // Buat order & catat transaksi (akan push ke cloud jika Cloud Sync aktif)
+        await doCheckout({ name, whatsApp, address, note });
       });
 
       // Product modal open
@@ -3549,6 +4719,35 @@ service firebase.storage {
         resetDemoData();
       });
 
+      // Shipping filters
+      const shipSearchEl = document.getElementById('shipSearch');
+      const shipSearchResetEl = document.getElementById('shipSearchReset');
+      const shipStatusFilterEl = document.getElementById('shipStatusFilter');
+      const exportShippingCsvEl = document.getElementById('exportShippingCsv');
+
+      if (shipSearchEl) {
+        shipSearchEl.addEventListener('input', (e) => {
+          state.shipSearch = e.target.value;
+          renderShipping();
+        });
+      }
+      if (shipSearchResetEl) {
+        shipSearchResetEl.addEventListener('click', () => {
+          state.shipSearch = '';
+          if (shipSearchEl) shipSearchEl.value = '';
+          renderShipping();
+        });
+      }
+      if (shipStatusFilterEl) {
+        shipStatusFilterEl.addEventListener('change', (e) => {
+          state.shipStatus = e.target.value;
+          renderShipping();
+        });
+      }
+      if (exportShippingCsvEl) {
+        exportShippingCsvEl.addEventListener('click', exportShippingReport);
+      }
+
       // Transactions filters
       document.getElementById('txSearch').addEventListener('input', (e) => {
         state.txSearch = e.target.value;
@@ -3601,9 +4800,17 @@ service firebase.storage {
       const saveOrderWebhookBtn = document.getElementById('saveOrderWebhookBtn');
       const testOrderWebhookBtn = document.getElementById('testOrderWebhookBtn');
 
+      // Admin WhatsApp (for Checkout -> Kirim WA)
+      const adminWhatsAppInput = document.getElementById('adminWhatsAppInput');
+      const saveAdminWhatsAppBtn = document.getElementById('saveAdminWhatsAppBtn');
+      const clearAdminWhatsAppBtn = document.getElementById('clearAdminWhatsAppBtn');
+
       if (orderWebhookEnabledEl) orderWebhookEnabledEl.checked = !!load(LS.orderWebhookEnabled, false);
       if (orderWebhookUrlEl) orderWebhookUrlEl.value = load(LS.orderWebhookUrl, '') || '';
       updateOrderWebhookStatusUI();
+
+      // Load WA admin setting
+      if (adminWhatsAppInput) adminWhatsAppInput.value = String(load(LS.adminWhatsApp, '') || '').trim();
 
       if (saveOrderWebhookBtn) {
         saveOrderWebhookBtn.addEventListener('click', () => {
@@ -3637,38 +4844,48 @@ service firebase.storage {
         });
       }
 
-      // Cloud Sync (Firebase)
+      // Save / clear WA admin
+      if (saveAdminWhatsAppBtn) {
+        saveAdminWhatsAppBtn.addEventListener('click', () => {
+          const v = String(adminWhatsAppInput?.value || '').trim();
+          save(LS.adminWhatsApp, v);
+          toast('Nomor WA Admin disimpan.');
+        });
+      }
+      if (clearAdminWhatsAppBtn) {
+        clearAdminWhatsAppBtn.addEventListener('click', () => {
+          save(LS.adminWhatsApp, '');
+          if (adminWhatsAppInput) adminWhatsAppInput.value = '';
+          toast('Nomor WA Admin dihapus.');
+        });
+      }
+
+      // Cloud Sync (Firebase) - now in header modal
       const cloudConnectBtn = document.getElementById('cloudConnectBtn');
       const cloudDisconnectBtn = document.getElementById('cloudDisconnectBtn');
       const cloudPullBtn = document.getElementById('cloudPullBtn');
       const cloudPushBtn = document.getElementById('cloudPushBtn');
       const cloudFillDefaultBtn = document.getElementById('cloudFillDefaultBtn');
       const cloudClearConfigBtn = document.getElementById('cloudClearConfigBtn');
-      const cloudTestStorageBtn = document.getElementById('cloudTestStorageBtn');
       const cloudShopId = document.getElementById('cloudShopId');
       const cloudConfigJson = document.getElementById('cloudConfigJson');
 
-      // preload saved values
-      if (cloudShopId) cloudShopId.value = load(LS.cloudShopId, cloudShopId.value || '') || 'varsha-shop-01';
-      if (cloudConfigJson) {
-        const saved = load(LS.cloudConfig, cloudConfigJson.value || '');
-        cloudConfigJson.value = saved || JSON.stringify(DEFAULT_FIREBASE_CONFIG, null, 2);
-      }
-
-      if (cloudFillDefaultBtn && cloudConfigJson) {
+      if (cloudFillDefaultBtn && cloudConfigJson && !cloudFillDefaultBtn._bound) {
         cloudFillDefaultBtn.addEventListener('click', () => {
           cloudConfigJson.value = JSON.stringify(DEFAULT_FIREBASE_CONFIG, null, 2);
           toast('Config default diisi.');
         });
+        cloudFillDefaultBtn._bound = true;
       }
-      if (cloudClearConfigBtn && cloudConfigJson) {
+      if (cloudClearConfigBtn && cloudConfigJson && !cloudClearConfigBtn._bound) {
         cloudClearConfigBtn.addEventListener('click', () => {
           cloudConfigJson.value = '';
           toast('Config dikosongkan.');
         });
+        cloudClearConfigBtn._bound = true;
       }
 
-      if (cloudConnectBtn) {
+      if (cloudConnectBtn && !cloudConnectBtn._bound) {
         cloudConnectBtn.addEventListener('click', async () => {
           const shopId = (cloudShopId?.value || '').trim();
           const configText = (cloudConfigJson?.value || '').trim();
@@ -3680,19 +4897,21 @@ service firebase.storage {
             toast('Cloud sync tersambung.');
           } catch (e) {
             console.warn(e);
-            toast('Gagal connect cloud. Lihat detail di menu Laporan.');
+            toast('Gagal connect cloud. Buka Cloud Sync untuk lihat detail.');
             updateCloudStatusUI('Offline');
             showCloudError(e);
           }
         });
+        cloudConnectBtn._bound = true;
       }
-      if (cloudDisconnectBtn) {
+      if (cloudDisconnectBtn && !cloudDisconnectBtn._bound) {
         cloudDisconnectBtn.addEventListener('click', async () => {
           await cloudDisconnect();
           hideCloudError();
         });
+        cloudDisconnectBtn._bound = true;
       }
-      if (cloudPullBtn) {
+      if (cloudPullBtn && !cloudPullBtn._bound) {
         cloudPullBtn.addEventListener('click', async () => {
           const shopId = (cloudShopId?.value || load(LS.cloudShopId, '')).trim();
           if (!shopId) return toast('Shop ID harus diisi.');
@@ -3703,12 +4922,13 @@ service firebase.storage {
             hideCloudError();
           } catch (e) {
             console.warn(e);
-            toast('Gagal pull. Lihat detail di menu Laporan.');
+            toast('Gagal pull. Buka Cloud Sync untuk lihat detail.');
             showCloudError(e);
           }
         });
+        cloudPullBtn._bound = true;
       }
-      if (cloudPushBtn) {
+      if (cloudPushBtn && !cloudPushBtn._bound) {
         cloudPushBtn.addEventListener('click', async () => {
           const shopId = (cloudShopId?.value || load(LS.cloudShopId, '')).trim();
           if (!shopId) return toast('Shop ID harus diisi.');
@@ -3719,37 +4939,11 @@ service firebase.storage {
             hideCloudError();
           } catch (e) {
             console.warn(e);
-            toast('Gagal push. Lihat detail di menu Laporan.');
+            toast('Gagal push. Buka Cloud Sync untuk lihat detail.');
             showCloudError(e);
           }
         });
-      }
-
-      if (cloudTestStorageBtn) {
-        cloudTestStorageBtn.addEventListener('click', async () => {
-          const shopId = (cloudShopId?.value || load(LS.cloudShopId, '')).trim();
-          if (!shopId) return toast('Shop ID harus diisi.');
-          if (!cloud.connected) return toast('Silakan Connect dulu.');
-          try {
-            cloudTestStorageBtn.disabled = true;
-            cloudTestStorageBtn.classList.add('opacity-60');
-            cloudTestStorageBtn.textContent = 'Testing...';
-            const res = await cloudTestStorage(shopId);
-            hideCloudError();
-            toast('Storage OK (test upload sukses).');
-            // update status with selected bucket
-            if (res?.bucket) updateCloudStatusUI(`Connected • projectId=${cloud.projectId}${res.bucket ? ` • bucket=${res.bucket}` : ''} • shop=${cloud.shopId}`);
-            console.log('Storage test success', res);
-          } catch (e) {
-            console.warn(e);
-            toast('Storage test gagal. Lihat detail di bawah.');
-            showCloudError(e);
-          } finally {
-            cloudTestStorageBtn.disabled = false;
-            cloudTestStorageBtn.classList.remove('opacity-60');
-            cloudTestStorageBtn.textContent = 'Test Storage';
-          }
-        });
+        cloudPushBtn._bound = true;
       }
 
       // GitHub Pages helper: copy rules
@@ -3816,7 +5010,12 @@ service firebase.storage {
      * Init
      **********************/
     ensureData();
+    ensureDefaultAccounts();
     bindEvents();
+    applyRoleUI();
+
+    // Ensure Firebase config default is always set (without overriding existing settings)
+    ensureCloudDefaults({ enable: false });
 
     // seed dashboard range
     const initRange = getRangeFromPeriod('month');
@@ -3838,7 +5037,8 @@ service firebase.storage {
     // If connected, do an initial pull (and push if cloud empty)
     (async () => {
       try {
-        // Auto-connect on open (if config + Shop ID already saved)
+        // Always ensure defaults exist, then auto-connect on open
+        ensureCloudDefaults({ enable: false });
         const res = await cloudEnsureConnected({ silent: true, forceConnect: true });
         if (res.ok && res.shopId) {
           await cloudAutoPullIfNeeded('init');
